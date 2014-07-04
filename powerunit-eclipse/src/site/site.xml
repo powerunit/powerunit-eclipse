@@ -1,0 +1,13 @@
+<project xmlns="http://maven.apache.org/DECORATION/1.3.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.3.0 http://maven.apache.org/xsd/decoration-1.3.0.xsd">
+  <poweredBy>
+    <logo name="PowerUnit" href="http://www.powerunit.ch/"
+          img="http://www.powerunit.ch/powerunit/logo.png"/>
+    <logo name="Travis-ci" href="https://travis-ci.org/powerunit/powerunit-eclipse"
+          img="https://travis-ci.org/powerunit/powerunit-eclipse.svg?branch=master"/>
+  </poweredBy>
+  <body>
+    <menu ref="reports" />
+  </body>
+</project>

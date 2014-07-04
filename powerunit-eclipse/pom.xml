@@ -374,24 +374,6 @@ This artifact is the eclipse integration</description>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.17</version>
-				<reportSets>
-					<reportSet>
-						<id>default</id>
-						<reports>
-							<report>report-only</report>
-						</reports>
-					</reportSet>
-				</reportSets>
-				<configuration>
-					<reportsDirectories>
-						<reportsDirectory>${project.build.directory}/base-surefire-reports</reportsDirectory>
-					</reportsDirectories>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
 				<version>2.4</version>
 			</plugin>
