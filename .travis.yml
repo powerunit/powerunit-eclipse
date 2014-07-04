@@ -5,4 +5,4 @@ before_install: git clone -b travis `git config --get remote.origin.url` target/
 script: '[ ${TRAVIS_PULL_REQUEST} = ''false'' ] && (cd powerunit-eclipse && mvn clean install site -Psite --settings ../target/travis/settings.xml)'
 env:
   global:
-    secure: xm6WCXJpG99CmCrYgCPfZdDV7ceFkf0ZpZV8nsXWzwNhut8jw13unVe9l/z8tn+EKigtHbkCxWKLSmoFnKQwz46vlYdCFAuEvnBcfDueWuxQSLgV6S1ri2xyAMmcaoVimG93hkZKDA6mjXfAxRekSZP94ikoRm50LJMEn9TKzPw=
+    secure: n7rmeqEoeMvWPtzzSuWNEqwdSz4vZBRvU39FkOC9Ov4qQBEoeJgbrGYq+u1BowPYetN2KUn43hqRy4N6npo5vLQihKwE1rnKqC2xQm8fqf/F5QIeWuLREDnmAa5Ds7xIfrpU+sJrQz8BVRrYY5ihjwGsqgX0Fp+FFOmSSALXmnA=
