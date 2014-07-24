@@ -20,8 +20,14 @@
 package ch.powerunit.poweruniteclipse;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.ui.ISharedImages;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.text.java.ClasspathFixProcessor;
+import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * @author borettim
@@ -29,12 +35,48 @@ import org.eclipse.jdt.ui.text.java.ClasspathFixProcessor;
  */
 public class PowerunitClasspathFixProcessor extends ClasspathFixProcessor {
 
+    private static class PowerUnitClasspathFixProposal extends
+            ClasspathFixProposal {
+
+        @Override
+        public String getDisplayString() {
+            return "Add Powerunit lib";
+        }
+
+        @Override
+        public String getAdditionalProposalInfo() {
+            return "This is the library to support Powerunit";
+        }
+
+        @Override
+        public Image getImage() {
+            return JavaUI.getSharedImages().getImage(
+                    ISharedImages.IMG_OBJS_LIBRARY);
+        }
+
+        @Override
+        public int getRelevance() {
+            return 10;
+        }
+
+        @Override
+        public Change createChange(IProgressMonitor monitor)
+                throws CoreException {
+            if (monitor == null) {
+                monitor = new NullProgressMonitor();
+            }
+            return null;
+        }
+
+    }
+
     @Override
     public ClasspathFixProposal[] getFixImportProposals(IJavaProject project,
             String missingType) throws CoreException {
         if (missingType.startsWith("ch.powerunit.")
+                || missingType.startsWith("org.junit.")
                 || missingType.equals("Test")) {
-            // TODO
+            return new ClasspathFixProposal[] { new PowerUnitClasspathFixProposal() };
         }
         return null;
     }
