@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+     <launchConfigurationType
+        name="Powerunit"
+        delegate="ch.powerunit.poweruniteclipse.PowerunitLaunchConfigurationDelegate"
+        modes="run, debug"               
+        id="ch.powerunit.launcher">        
+    </launchConfigurationType>
+   </extension>
+   
+   <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+    <launchConfigurationTypeImage
+        icon="logo.gif"
+        configTypeID="ch.powerunit.launcher"
+        id="ch.powerunit.launcher.icon">
+    </launchConfigurationTypeImage>
+   </extension>
+   
+   <extension point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+    <launchConfigurationTabGroup
+        type="ch.powerunit.launcher"
+        class="ch.powerunit.poweruniteclipse.PowerunitLaunchTabGroup"
+        id="ch.powerunit.launcher.tab">
+    </launchConfigurationTabGroup>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="ch.powerunit.launcher.shortcut"
+        class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationShortcut"
+        label="Powerunit Test"
+        icon="logo.gif"
+        modes="run, debug">
+            <perspective id="org.eclipse.jdt.ui.JavaPerspective"/>
+            <perspective id="org.eclipse.jdt.ui.JavaHierarchyPerspective"/>
+            <perspective id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
+            <perspective id="org.eclipse.debug.ui.DebugPerspective"/>
+    </shortcut>
+  </extension>
+
+
+  <extension point = "org.eclipse.debug.ui.launchGroups">
+	<launchGroup
+		id = "org.eclipse.debug.ui.launchGroup.debug"
+		mode = "debug"
+		label ="Debug"
+		image = "logo.gif"
+		bannerImage = "logo.gif">
+	</launchGroup>
+	<launchGroup
+		id = "org.eclipse.debug.ui.launchGroup.run"
+		mode = "run"
+		label = "Run"
+		image = "logo.gif"
+		bannerImage = "logo.gif">
+	</launchGroup> 
+  </extension>
+</plugin>
