@@ -8,12 +8,12 @@
 	<description>This is a test framework for the JDK 1.8.
 
 This artifact is the eclipse integration</description>
-	<packaging>eclipse-plugin</packaging>
+	<packaging>pom</packaging>
 	<issueManagement>
 		<system>GitHub</system>
 		<url>https://github.com/powerunit/powerunit-eclipse/issues</url>
 	</issueManagement>
-	<url>http://www.powerunit.ch/powerunit-eclipse</url>
+	<url>http://www.powerunit.ch/powerunit-eclipse/${project.artifactId}</url>
 
 	<licenses>
 		<license>
@@ -219,6 +219,7 @@ This artifact is the eclipse integration</description>
 						<configuration>
 							<message>Creating site for ${project.version}</message>
 							<server>github</server>
+							<path>${project.artifactId}</path>
 						</configuration>
 						<executions>
 							<execution>
@@ -256,5 +257,11 @@ This artifact is the eclipse integration</description>
 
 	<dependencies>
 	</dependencies>
+	
+	<modules>
+		<module>../powerunit-eclipse-plugin</module>
+		<module>../powerunit-eclipse-feature</module>
+		<module>../powerunit-eclipse-p2updatesite</module>
+	</modules>
 
 </project>

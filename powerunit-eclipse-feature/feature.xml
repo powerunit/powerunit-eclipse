@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="ch.powerunit.eclipse.feature"
+      label="ch.powerunit.eclipse.feature"
+      version="0.0.1.qualifier"
+      provider-name="PowerUnit"
+      plugin="ch.powerunit.eclipse.plugin">
+
+</feature>
