@@ -33,8 +33,8 @@ public class PowerunitLaunchConfigurationDelegate extends
         AbstractJavaLaunchConfigurationDelegate {
 
     @Override
-    public void launch(ILaunchConfiguration arg0, String arg1, ILaunch arg2,
-            IProgressMonitor arg3) throws CoreException {
+    public void launch(ILaunchConfiguration configuration, String mode,
+            ILaunch launch, IProgressMonitor monitor) throws CoreException {
         // TODO Auto-generated method stub
 
     }

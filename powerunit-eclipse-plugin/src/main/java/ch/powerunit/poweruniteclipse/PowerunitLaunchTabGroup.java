@@ -35,85 +35,42 @@ public class PowerunitLaunchTabGroup implements ILaunchConfigurationTabGroup {
 
     private ILaunchConfigurationTab[] tabs;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#createTabs(org.eclipse
-     * .debug.ui.ILaunchConfigurationDialog, java.lang.String)
-     */
     @Override
-    public void createTabs(ILaunchConfigurationDialog arg0, String arg1) {
+    public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
         tabs = new ILaunchConfigurationTab[] { new CommonTab() };
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.debug.ui.ILaunchConfigurationTabGroup#dispose()
-     */
-    @Override
-    public void dispose() {
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.debug.ui.ILaunchConfigurationTabGroup#getTabs()
-     */
     @Override
     public ILaunchConfigurationTab[] getTabs() {
         return tabs;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#initializeFrom(org.
-     * eclipse.debug.core.ILaunchConfiguration)
-     */
     @Override
-    public void initializeFrom(ILaunchConfiguration arg0) {
+    public void dispose() {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#launched(org.eclipse
-     * .debug.core.ILaunch)
-     */
     @Override
-    public void launched(ILaunch arg0) {
+    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#performApply(org.eclipse
-     * .debug.core.ILaunchConfigurationWorkingCopy)
-     */
     @Override
-    public void performApply(ILaunchConfigurationWorkingCopy arg0) {
+    public void initializeFrom(ILaunchConfiguration configuration) {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTabGroup#setDefaults(org.eclipse
-     * .debug.core.ILaunchConfigurationWorkingCopy)
-     */
     @Override
-    public void setDefaults(ILaunchConfigurationWorkingCopy arg0) {
+    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void launched(ILaunch launch) {
         // TODO Auto-generated method stub
 
     }

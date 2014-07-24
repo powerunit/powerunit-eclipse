@@ -58,4 +58,30 @@
 		bannerImage = "logo.gif">
 	</launchGroup> 
   </extension>
+  
+  <extension point="org.eclipse.jdt.ui.classpathContainerPage">
+    <classpathContainerPage
+        name="Powerunit library"
+        class="ch.powerunit.poweruniteclipse.PowerunitContainerWizardPage"
+        id="ch.powerunit.POWERUNIT_CONTAINER">
+    </classpathContainerPage>
+  </extension>
+  
+  <extension point="org.eclipse.jdt.ui.quickFixProcessors">
+    <quickFixProcessor
+        name="Add Powerunit library"
+        class="ch.powerunit.poweruniteclipse.PowerunitQuickFixProcessor"
+        id="ch.powerunit.QuickFixProcessor">
+    </quickFixProcessor>
+  </extension>
+
+  <extension point="org.eclipse.jdt.ui.classpathFixProcessors">
+    <classpathFixProcessor
+        name="Add Powerunit library"
+        class="ch.powerunit.poweruniteclipse.PowerunitClasspathFixProcessor"
+        id="ch.powerunit.ClasspathFixProcessor">
+        <overrides id="org.eclipse.jdt.ui.text.correction.DefaultClasspathFixProcessor">
+        </overrides>
+    </classpathFixProcessor>
+  </extension>
 </plugin>

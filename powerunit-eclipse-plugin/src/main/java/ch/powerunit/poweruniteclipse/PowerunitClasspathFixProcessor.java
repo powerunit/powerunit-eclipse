@@ -19,26 +19,24 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import org.eclipse.debug.ui.ILaunchShortcut;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.ui.text.java.ClasspathFixProcessor;
 
 /**
  * @author borettim
  *
  */
-public class PowerunitlaunchConfigurationShortcut implements ILaunchShortcut {
+public class PowerunitClasspathFixProcessor extends ClasspathFixProcessor {
 
     @Override
-    public void launch(ISelection selection, String mode) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void launch(IEditorPart editor, String mode) {
-        // TODO Auto-generated method stub
-
+    public ClasspathFixProposal[] getFixImportProposals(IJavaProject project,
+            String missingType) throws CoreException {
+        if (missingType.startsWith("ch.powerunit.")
+                || missingType.equals("Test")) {
+            // TODO
+        }
+        return null;
     }
 
 }

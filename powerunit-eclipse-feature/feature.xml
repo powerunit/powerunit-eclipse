@@ -6,4 +6,23 @@
       provider-name="PowerUnit"
       plugin="ch.powerunit.eclipse.plugin">
 
+   <requires>
+      <import plugin="org.eclipse.ui" version="3.106.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.core" version="3.9.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.debug.ui" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.launching" version="3.7.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.debug" version="3.8.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.debug.ui" version="3.6.300" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.ui" version="3.10.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="ch.powerunit.eclipse.plugin"
+         download-size="0"
+         install-size="0"
+         version="0.0.1.qualifier"
+         unpack="false"/>
+
 </feature>
