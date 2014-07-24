@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Feature
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: ch.powerunit.eclipse.feature
 Bundle-Version: 1.0.0.qualifier

@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
      <launchConfigurationType
-        name="Powerunit"
+        name="%launchConfigurationType.name"
         delegate="ch.powerunit.poweruniteclipse.PowerunitLaunchConfigurationDelegate"
         modes="run, debug"               
         id="ch.powerunit.launcher">        
@@ -13,7 +13,7 @@
    
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
     <launchConfigurationTypeImage
-        icon="logo.gif"
+        icon="icons/logo.gif"
         configTypeID="ch.powerunit.launcher"
         id="ch.powerunit.launcher.icon">
     </launchConfigurationTypeImage>
@@ -31,13 +31,9 @@
     <shortcut
         id="ch.powerunit.launcher.shortcut"
         class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationShortcut"
-        label="Powerunit Test"
-        icon="logo.gif"
+        label="%shortcut.label"
+        icon="icons/logo.gif"
         modes="run, debug">
-            <perspective id="org.eclipse.jdt.ui.JavaPerspective"/>
-            <perspective id="org.eclipse.jdt.ui.JavaHierarchyPerspective"/>
-            <perspective id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
-            <perspective id="org.eclipse.debug.ui.DebugPerspective"/>
     </shortcut>
   </extension>
 
@@ -46,22 +42,28 @@
 	<launchGroup
 		id = "org.eclipse.debug.ui.launchGroup.debug"
 		mode = "debug"
-		label ="Debug"
-		image = "logo.gif"
-		bannerImage = "logo.gif">
+		label ="%launchGroup.label"
+		image = "icons/logo.gif"
+		bannerImage = "icons/logo.gif">
 	</launchGroup>
 	<launchGroup
 		id = "org.eclipse.debug.ui.launchGroup.run"
 		mode = "run"
-		label = "Run"
-		image = "logo.gif"
-		bannerImage = "logo.gif">
+		label = "%launchGroup.label.0"
+		image = "icons/logo.gif"
+		bannerImage = "icons/logo.gif">
 	</launchGroup> 
   </extension>
   
+  <extension point="org.eclipse.jdt.core.classpathContainerInitializer">            
+   <classpathContainerInitializer                                          
+      id="ch.powerunit.POWERUNIT_CONTAINER"                                                        
+      class="ch.powerunit.poweruniteclipse.PowerunitClasspathInitializer"/>                           
+</extension>
+  
   <extension point="org.eclipse.jdt.ui.classpathContainerPage">
     <classpathContainerPage
-        name="Powerunit library"
+        name="%classpathContainerPage.name"
         class="ch.powerunit.poweruniteclipse.PowerunitContainerWizardPage"
         id="ch.powerunit.POWERUNIT_CONTAINER">
     </classpathContainerPage>
@@ -69,15 +71,16 @@
   
   <extension point="org.eclipse.jdt.ui.quickFixProcessors">
     <quickFixProcessor
-        name="Add Powerunit library"
-        class="ch.powerunit.poweruniteclipse.PowerunitQuickFixProcessor"
-        id="ch.powerunit.QuickFixProcessor">
+          class="ch.powerunit.poweruniteclipse.PowerunitQuickFixProcessor"
+          id="ch.powerunit.QuickFixProcessor"
+          name="%quickFixProcessor.name"
+          requiredSourceLevel="1.8">
     </quickFixProcessor>
   </extension>
 
   <extension point="org.eclipse.jdt.ui.classpathFixProcessors">
     <classpathFixProcessor
-        name="Add Powerunit library"
+        name="%classpathFixProcessor.name"
         class="ch.powerunit.poweruniteclipse.PowerunitClasspathFixProcessor"
         id="ch.powerunit.ClasspathFixProcessor">
         <overrides id="org.eclipse.jdt.ui.text.correction.DefaultClasspathFixProcessor">

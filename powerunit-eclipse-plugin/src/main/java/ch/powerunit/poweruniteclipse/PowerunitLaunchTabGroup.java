@@ -47,8 +47,6 @@ public class PowerunitLaunchTabGroup implements ILaunchConfigurationTabGroup {
 
     @Override
     public void dispose() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
