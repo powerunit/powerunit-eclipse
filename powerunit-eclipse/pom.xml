@@ -220,6 +220,7 @@ This artifact is the eclipse integration</description>
 							<message>Creating site for ${project.version}</message>
 							<server>github</server>
 							<path>${project.artifactId}</path>
+							<merge>true</merge>
 						</configuration>
 						<executions>
 							<execution>
