@@ -19,58 +19,27 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import org.eclipse.debug.core.ILaunch;
-import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.ui.AbstractLaunchConfigurationTabGroup;
 import org.eclipse.debug.ui.CommonTab;
+import org.eclipse.debug.ui.EnvironmentTab;
 import org.eclipse.debug.ui.ILaunchConfigurationDialog;
 import org.eclipse.debug.ui.ILaunchConfigurationTab;
-import org.eclipse.debug.ui.ILaunchConfigurationTabGroup;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaArgumentsTab;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaClasspathTab;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaJRETab;
 
 /**
  * @author borettim
  *
  */
-public class PowerunitLaunchTabGroup implements ILaunchConfigurationTabGroup {
-
-    private ILaunchConfigurationTab[] tabs;
+public class PowerunitLaunchTabGroup extends
+        AbstractLaunchConfigurationTabGroup {
 
     @Override
     public void createTabs(ILaunchConfigurationDialog dialog, String mode) {
-        tabs = new ILaunchConfigurationTab[] { new CommonTab() };
-    }
-
-    @Override
-    public ILaunchConfigurationTab[] getTabs() {
-        return tabs;
-    }
-
-    @Override
-    public void dispose() {
-    }
-
-    @Override
-    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void initializeFrom(ILaunchConfiguration configuration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void launched(ILaunch launch) {
-        // TODO Auto-generated method stub
-
+        setTabs(new ILaunchConfigurationTab[] { new PowerUnitLaunchTab(),
+                new JavaArgumentsTab(), new JavaJRETab(),
+                new JavaClasspathTab(), new EnvironmentTab(), new CommonTab() });
     }
 
 }

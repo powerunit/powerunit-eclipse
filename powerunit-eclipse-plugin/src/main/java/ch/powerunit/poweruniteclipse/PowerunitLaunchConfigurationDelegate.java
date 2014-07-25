@@ -23,7 +23,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.IVMRunner;
+import org.eclipse.jdt.launching.VMRunnerConfiguration;
 
 /**
  * @author borettim
@@ -35,8 +39,30 @@ public class PowerunitLaunchConfigurationDelegate extends
     @Override
     public void launch(ILaunchConfiguration configuration, String mode,
             ILaunch launch, IProgressMonitor monitor) throws CoreException {
-        // TODO Auto-generated method stub
+        IJavaProject project = verifyJavaProject(configuration);
 
+        IVMInstall vm = verifyVMInstall(configuration);
+        IVMRunner runner = vm.getVMRunner(mode);
+
+        String workingDirName = verifyWorkingDirectory(configuration)
+                .getAbsolutePath();
+
+        String classpath[] = getClasspath(configuration);
+
+        // Create VM config
+        VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
+                "sun.applet.AppletViewer", classpath);
+        runConfig.setProgramArguments(new String[] { /* ... */});
+        runConfig
+                .setVMArguments(new String[] { getVMArguments(configuration) });
+
+        runConfig.setWorkingDirectory(workingDirName);
+
+        // Bootpath
+        String[] bootpath = getBootpath(configuration);
+        runConfig.setBootClassPath(bootpath);
+
+        // Launch the configuration
+        runner.run(runConfig, launch, monitor);
     }
-
 }

@@ -20,7 +20,10 @@
 package ch.powerunit.poweruniteclipse;
 
 import org.eclipse.debug.ui.ILaunchShortcut;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 
 /**
@@ -31,12 +34,22 @@ public class PowerunitlaunchConfigurationShortcut implements ILaunchShortcut {
 
     @Override
     public void launch(ISelection selection, String mode) {
-        // TODO Auto-generated method stub
-
+        if (selection instanceof IStructuredSelection) {
+            searchAndLaunch(((IStructuredSelection) selection).toArray(), mode);
+        }
     }
 
     @Override
     public void launch(IEditorPart editor, String mode) {
+        IEditorInput input = editor.getEditorInput();
+        IJavaElement javaElement = (IJavaElement) input
+                .getAdapter(IJavaElement.class);
+        if (javaElement != null) {
+            searchAndLaunch(new Object[] { javaElement }, mode);
+        }
+    }
+
+    private void searchAndLaunch(Object[] array, String mode) {
         // TODO Auto-generated method stub
 
     }

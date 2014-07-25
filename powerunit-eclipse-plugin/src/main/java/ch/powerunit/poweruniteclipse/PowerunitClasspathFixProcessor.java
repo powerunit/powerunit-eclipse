@@ -75,7 +75,8 @@ public class PowerunitClasspathFixProcessor extends ClasspathFixProcessor {
             String missingType) throws CoreException {
         if (missingType.startsWith("ch.powerunit.")
                 || missingType.startsWith("org.junit.")
-                || missingType.equals("Test")) {
+                || missingType.equals("Test")
+                || missingType.equals("TestSuite")) {
             return new ClasspathFixProposal[] { new PowerUnitClasspathFixProposal() };
         }
         return null;

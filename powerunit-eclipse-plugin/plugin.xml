@@ -13,7 +13,7 @@
    
    <extension point="org.eclipse.debug.ui.launchConfigurationTypeImages">
     <launchConfigurationTypeImage
-        icon="icons/logo.gif"
+        icon="./icons/logo.gif"
         configTypeID="ch.powerunit.launcher"
         id="ch.powerunit.launcher.icon">
     </launchConfigurationTypeImage>
@@ -32,8 +32,39 @@
         id="ch.powerunit.launcher.shortcut"
         class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationShortcut"
         label="%shortcut.label"
-        icon="icons/logo.gif"
+        icon="./icons/logo.gif"
         modes="run, debug">
+        <description
+     		description="%description.description"
+     		mode="run">
+    	</description>
+	    <description
+	     	description="%description.description.0"
+	     	mode="debug">
+	    </description>
+	    <contextualLaunch>
+			<enablement>
+				<with variable="selection">
+				 <count value="1"/>
+				  <iterate>
+				   <or>
+					 <test property="org.eclipse.jdt.launching.isPackageFragment"/>
+                     <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>
+                     <and>
+                     	<test property="org.eclipse.jdt.launching.extendsInterface" args="ch.powerunit.TestSuite"/>
+                     </and>
+					 <and>
+					 	<test property="org.eclipse.jdt.launching.isContainer"/>
+					 	<test property="org.eclipse.jdt.launching.hasProjectNature" args="org.eclipse.jdt.core.javanature"/>
+					 </and>
+					</or>
+				  </iterate>
+				 </with>
+			</enablement>
+		</contextualLaunch>
+		<configurationType
+			id="ch.powerunit.launcher">
+		</configurationType>
     </shortcut>
   </extension>
 
@@ -43,15 +74,15 @@
 		id = "org.eclipse.debug.ui.launchGroup.debug"
 		mode = "debug"
 		label ="%launchGroup.label"
-		image = "icons/logo.gif"
-		bannerImage = "icons/logo.gif">
+		image = "./icons/logo.gif"
+		bannerImage = "./icons/logo.gif">
 	</launchGroup>
 	<launchGroup
 		id = "org.eclipse.debug.ui.launchGroup.run"
 		mode = "run"
 		label = "%launchGroup.label.0"
-		image = "icons/logo.gif"
-		bannerImage = "icons/logo.gif">
+		image = "./icons/logo.gif"
+		bannerImage = "./icons/logo.gif">
 	</launchGroup> 
   </extension>
   
