@@ -21,9 +21,6 @@ package ch.powerunit.poweruniteclipse;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -44,7 +41,6 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickFixProcessor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.ltk.core.refactoring.Change;
@@ -55,8 +51,6 @@ import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.ltk.ui.refactoring.RefactoringUI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.PlatformUI;
 
 /**
@@ -64,15 +58,6 @@ import org.eclipse.ui.PlatformUI;
  *
  */
 public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
-
-    private static final Set<String> NAMES;
-
-    static {
-        Set<String> tmp = new HashSet<String>();
-        tmp.add("Test");
-        tmp.add("TestSuite");
-        NAMES = Collections.unmodifiableSet(tmp);
-    }
 
     /*
      * (non-Javadoc)
@@ -83,8 +68,7 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
      */
     @Override
     public boolean hasCorrections(ICompilationUnit unit, int problemId) {
-        return problemId == IProblem.UndefinedType
-                || problemId == IProblem.UndefinedMethod;
+        return problemId == IProblem.UndefinedType;
     }
 
     /*
@@ -104,31 +88,12 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
             int id = problem.getProblemId();
             if (IProblem.UndefinedType == id) {
                 res = getAddPowerunitToBuildPathProposals(context, problem, res);
-            } else if (id == IProblem.UndefinedMethod) {
-                res = getAddImportProposals(context, problem, res);
             }
         }
         if (res == null || res.isEmpty()) {
             return null;
         }
         return res.toArray(new IJavaCompletionProposal[res.size()]);
-    }
-
-    private ArrayList<IJavaCompletionProposal> getAddImportProposals(
-            IInvocationContext context, IProblemLocation problem,
-            ArrayList<IJavaCompletionProposal> proposals) {
-        String[] args = problem.getProblemArguments();
-        if (args.length > 1) {
-            String methodName = args[1];
-            if (NAMES.contains(methodName)) {
-                if (proposals == null) {
-                    proposals = new ArrayList<>();
-                }
-                proposals.add(new AddProposal(context.getASTRoot(), methodName,
-                        9));
-            }
-        }
-        return proposals;
     }
 
     private ArrayList<IJavaCompletionProposal> getAddPowerunitToBuildPathProposals(
@@ -138,22 +103,24 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
             ICompilationUnit unit = context.getCompilationUnit();
             String s = unit.getBuffer().getText(location.getOffset(),
                     location.getLength());
+            if ("Test".equals(s) || "TestSuite".equals(s)) {
 
-            String qualifiedName = "org.powerunit." + s;
+                String qualifiedName = "ch.powerunit." + s;
 
-            IJavaProject javaProject = unit.getJavaProject();
-            if (javaProject.findType(qualifiedName) != null) {
-                return proposals;
-            }
-            ClasspathFixProposal[] fixProposals = ClasspathFixProcessor
-                    .getContributedFixImportProposals(javaProject,
-                            qualifiedName, null);
-            for (int i = 0; i < fixProposals.length; i++) {
-                if (proposals == null)
-                    proposals = new ArrayList<>();
-                proposals.add(new PowerUnitClasspathFixCorrectionProposal(
-                        javaProject, fixProposals[i], getImportRewrite(
-                                context.getASTRoot(), qualifiedName)));
+                IJavaProject javaProject = unit.getJavaProject();
+                if (javaProject.findType(qualifiedName) != null) {
+                    return proposals;
+                }
+                ClasspathFixProposal[] fixProposals = ClasspathFixProcessor
+                        .getContributedFixImportProposals(javaProject,
+                                qualifiedName, null);
+                for (int i = 0; i < fixProposals.length; i++) {
+                    if (proposals == null)
+                        proposals = new ArrayList<>();
+                    proposals.add(new PowerUnitClasspathFixCorrectionProposal(
+                            javaProject, fixProposals[i], getImportRewrite(
+                                    context.getASTRoot(), qualifiedName)));
+                }
             }
         } catch (JavaModelException e) {
             // TODO
@@ -264,86 +231,6 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
 
         @Override
         public Point getSelection(IDocument document) {
-            return null;
-        }
-    }
-
-    private static class AddProposal implements IJavaCompletionProposal {
-
-        private final CompilationUnit fAstRoot;
-        private final String fMethodName;
-        private final int fRelevance;
-
-        public AddProposal(CompilationUnit astRoot, String methodName,
-                int relevance) {
-            fAstRoot = astRoot;
-            fMethodName = methodName;
-            fRelevance = relevance;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.eclipse.jdt.ui.text.java.IJavaCompletionProposal#getRelevance()
-         */
-        @Override
-        public int getRelevance() {
-            return fRelevance;
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.eclipse.jface.text.contentassist.ICompletionProposal#apply(org
-         * .eclipse.jface.text.IDocument)
-         */
-        @Override
-        public void apply(IDocument document) {
-            try {
-                ImportRewrite rewrite = CodeStyleConfiguration
-                        .createImportRewrite(fAstRoot, true);
-                rewrite.addStaticImport("org.junit.Assert", fMethodName, true); //$NON-NLS-1$
-                TextEdit edit = rewrite.rewriteImports(null);
-                edit.apply(document);
-            } catch (MalformedTreeException e) {
-            } catch (CoreException e) {
-            } catch (BadLocationException e) {
-            }
-        }
-
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.text.contentassist.ICompletionProposal#
-         * getAdditionalProposalInfo()
-         */
-        @Override
-        public String getAdditionalProposalInfo() {
-            return "TODO";
-        }
-
-        @Override
-        public Point getSelection(IDocument document) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public String getDisplayString() {
-            return "TODO";
-        }
-
-        @Override
-        public Image getImage() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public IContextInformation getContextInformation() {
-            // TODO Auto-generated method stub
             return null;
         }
     }
