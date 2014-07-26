@@ -19,11 +19,10 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 import java.util.Arrays;
 
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -89,13 +88,15 @@ public class Activator extends AbstractUIPlugin {
     }
 
     public IPath getPowerUnitPath() {
-        String basePath = powerunitBundle.getLocation();
+        String basePath = null;
         try {
-            return new Path(new File(new URI(basePath.replaceAll("reference:",
-                    ""))).getAbsolutePath());
-        } catch (URISyntaxException e) {
-            return null;
+            basePath = FileLocator.getBundleFile(powerunitBundle)
+                    .getAbsolutePath();
+        } catch (IOException e1) {
+            // TODO
         }
+
+        return new Path(basePath);
     }
 
 }
