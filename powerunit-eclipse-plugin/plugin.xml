@@ -48,15 +48,17 @@
 				 <count value="1"/>
 				  <iterate>
 				   <or>
+				   	<!--
 					 <test property="org.eclipse.jdt.launching.isPackageFragment"/>
-                     <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>
+                     <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>-->
                      <and>
                      	<test property="org.eclipse.jdt.launching.extendsInterface" args="ch.powerunit.TestSuite"/>
                      </and>
+                     <!--
 					 <and>
 					 	<test property="org.eclipse.jdt.launching.isContainer"/>
 					 	<test property="org.eclipse.jdt.launching.hasProjectNature" args="org.eclipse.jdt.core.javanature"/>
-					 </and>
+					 </and>-->
 					</or>
 				  </iterate>
 				 </with>
@@ -104,8 +106,14 @@
     <quickFixProcessor
           class="ch.powerunit.poweruniteclipse.PowerunitQuickFixProcessor"
           id="ch.powerunit.QuickFixProcessor"
-          name="%quickFixProcessor.name"
-          requiredSourceLevel="1.8">
+          name="%quickFixProcessor.name">
+    	<enablement>
+	      <with variable="projectNatures">
+	         <iterate operator="or">
+	            <equals value="org.eclipse.jdt.core.javanature"/>
+	         </iterate>
+	      </with>
+   		</enablement>
     </quickFixProcessor>
   </extension>
 

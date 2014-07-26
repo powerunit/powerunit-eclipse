@@ -19,39 +19,89 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import org.eclipse.debug.ui.ILaunchShortcut;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
+import java.util.Arrays;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
+import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.debug.ui.launchConfigurations.JavaLaunchShortcut;
+import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
+import org.eclipse.jdt.internal.debug.ui.launcher.LauncherMessages;
+import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableContext;
 
 /**
  * @author borettim
  *
  */
-public class PowerunitlaunchConfigurationShortcut implements ILaunchShortcut {
+public class PowerunitlaunchConfigurationShortcut extends JavaLaunchShortcut {
 
-    @Override
-    public void launch(ISelection selection, String mode) {
-        if (selection instanceof IStructuredSelection) {
-            searchAndLaunch(((IStructuredSelection) selection).toArray(), mode);
-        }
+    private ILaunchManager getLaunchManager() {
+        return DebugPlugin.getDefault().getLaunchManager();
     }
 
     @Override
-    public void launch(IEditorPart editor, String mode) {
-        IEditorInput input = editor.getEditorInput();
-        IJavaElement javaElement = (IJavaElement) input
-                .getAdapter(IJavaElement.class);
-        if (javaElement != null) {
-            searchAndLaunch(new Object[] { javaElement }, mode);
-        }
+    protected ILaunchConfigurationType getConfigurationType() {
+        return getLaunchManager().getLaunchConfigurationType(
+                "ch.powerunit.launcher");
     }
 
-    private void searchAndLaunch(Object[] array, String mode) {
+    @Override
+    protected ILaunchConfiguration createConfiguration(IType type) {
+        ILaunchConfiguration config = null;
+        ILaunchConfigurationWorkingCopy wc = null;
+        try {
+            ILaunchConfigurationType configType = getConfigurationType();
+            wc = configType.newInstance(
+                    null,
+                    getLaunchManager().generateLaunchConfigurationName(
+                            type.getTypeQualifiedName('.')));
+            wc.setAttribute(
+                    IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, type
+                            .getCompilationUnit().getJavaProject()
+                            .getElementName());
+            wc.setAttribute(
+                    IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
+                    type.getFullyQualifiedName());
+            config = wc.doSave();
+        } catch (CoreException exception) {
+            MessageDialog.openError(JDIDebugUIPlugin.getActiveWorkbenchShell(),
+                    LauncherMessages.JavaLaunchShortcut_3, exception
+                            .getStatus().getMessage());
+        }
+        return config;
+    }
+
+    @Override
+    protected IType[] findTypes(Object[] elements, IRunnableContext context)
+            throws InterruptedException, CoreException {
+        CompilationUnit cu = (CompilationUnit) elements[0];
+        IType type = Arrays.stream(cu.getAllTypes()).findFirst().orElse(null);
+        return new IType[] { type };
+    }
+
+    @Override
+    protected String getTypeSelectionTitle() {
         // TODO Auto-generated method stub
+        return null;
+    }
 
+    @Override
+    protected String getEditorEmptyMessage() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected String getSelectionEmptyMessage() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
