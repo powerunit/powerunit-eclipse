@@ -14,7 +14,7 @@
 
 This artifact is the eclipse integration - Feature</description>
 	<packaging>eclipse-feature</packaging>
-	
+
 	<scm>
 		<connection>scm:git:git@github.com:powerunit/powerunit-eclipse.git</connection>
 		<url>https://github.com/powerunit/powerunit-eclipse/</url>

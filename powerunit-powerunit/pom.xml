@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>ch.powerunit</groupId>
+	<artifactId>ch.powerunit.powerunit</artifactId>
+	<parent>
+		<groupId>ch.powerunit</groupId>
+		<artifactId>powerunit-eclipse</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../powerunit-eclipse/pom.xml</relativePath>
+	</parent>
+	<name>Powerunit - Java Testing framework for JDK 1.8 - Eclipse integration - PowerUnit exposition</name>
+	<description>This is a test framework for the JDK 1.8.
+
+This artifact is the eclipse integration - PowerUnit exposition</description>
+	<packaging>eclipse-plugin</packaging>
+
+	<scm>
+		<connection>scm:git:git@github.com:powerunit/powerunit-eclipse.git</connection>
+		<url>https://github.com/powerunit/powerunit-eclipse/</url>
+		<developerConnection>scm:git:git@github.com:powerunit/powerunit-eclipse.git</developerConnection>
+	</scm>
+
+	<dependencies>
+		<dependency>
+			<groupId>ch.powerunit</groupId>
+			<artifactId>powerunit-with-dependencies</artifactId>
+			<version>0.1.0</version>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack-dependencies</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/classes</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-dependency-plugin
+										</artifactId>
+										<versionRange>
+											[2.8,)
+										</versionRange>
+										<goals>
+											<goal>
+												unpack-dependencies
+											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+
+</project>

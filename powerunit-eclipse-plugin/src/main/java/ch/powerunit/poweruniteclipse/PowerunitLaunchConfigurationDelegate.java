@@ -19,6 +19,11 @@
  */
 package ch.powerunit.poweruniteclipse;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -44,18 +49,33 @@ public class PowerunitLaunchConfigurationDelegate extends
         IVMInstall vm = verifyVMInstall(configuration);
         IVMRunner runner = vm.getVMRunner(mode);
 
-        String workingDirName = verifyWorkingDirectory(configuration)
-                .getAbsolutePath();
+        Path p = null;
+        try {
+            p = Files.createTempDirectory("powerunit");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        File workingDir = verifyWorkingDirectory(configuration);
+        String workingDirName = null;
+        if (workingDir != null) {
+            workingDirName = workingDir.getAbsolutePath();
+        }
 
         String classpath[] = getClasspath(configuration);
 
         // Create VM config
         VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
-                "sun.applet.AppletViewer", classpath);
-        runConfig.setProgramArguments(new String[] { /* ... */});
-        runConfig
-                .setVMArguments(new String[] { getVMArguments(configuration) });
-
+                "ch.powerunit.PowerUnitMainRunner", classpath);
+        runConfig.setEnvironment(getEnvironment(configuration));
+        runConfig.setProgramArguments(new String[] {
+                p.toFile().getAbsolutePath(),
+                getProgramArguments(configuration) });
+        if (!"".equals(getVMArguments(configuration))) {
+            runConfig
+                    .setVMArguments(new String[] { getVMArguments(configuration) });
+        }
         runConfig.setWorkingDirectory(workingDirName);
 
         // Bootpath

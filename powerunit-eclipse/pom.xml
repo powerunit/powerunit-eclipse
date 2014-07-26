@@ -127,6 +127,7 @@ This artifact is the eclipse integration</description>
 						<encoding>${project.build.sourceEncoding}</encoding>
 						<source>${java.source.version}</source>
 						<target>${java.target.version}</target>
+						<pomDependencies>consider</pomDependencies>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -145,6 +146,13 @@ This artifact is the eclipse integration</description>
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>target-platform-configuration</artifactId>
 					<version>${tycho.version}</version>
+					<configuration>
+						<pomDependencies>consider</pomDependencies>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.8</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -258,11 +266,12 @@ This artifact is the eclipse integration</description>
 
 	<dependencies>
 	</dependencies>
-	
+
 	<modules>
 		<module>../powerunit-eclipse-plugin</module>
 		<module>../powerunit-eclipse-feature</module>
 		<module>../powerunit-eclipse-p2updatesite</module>
+		<module>../powerunit-powerunit</module>
 	</modules>
 
 </project>
