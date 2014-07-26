@@ -21,8 +21,12 @@ package ch.powerunit.poweruniteclipse;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ClasspathContainerInitializer;
+import org.eclipse.jdt.core.IClasspathContainer;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 
 /**
  * @author borettim
@@ -30,6 +34,38 @@ import org.eclipse.jdt.core.IJavaProject;
  */
 public class PowerunitClasspathInitializer extends
         ClasspathContainerInitializer {
+
+    private static final class PowerUnitContainer implements
+            IClasspathContainer {
+        private IClasspathEntry powerunit = JavaCore.newLibraryEntry(Activator
+                .getDefault().getPowerUnitPath(), Activator.getDefault()
+                .getPowerUnitPath(), null);
+
+        @Override
+        public IClasspathEntry[] getClasspathEntries() {
+            return new IClasspathEntry[] { powerunit };
+        }
+
+        @Override
+        public String getDescription() {
+            return "PowerUnit";
+        }
+
+        @Override
+        public int getKind() {
+            return K_APPLICATION;
+        }
+
+        @Override
+        public IPath getPath() {
+            return POWERUNIT_ENTRY.getPath();
+        }
+    }
+
+    public static final IClasspathEntry POWERUNIT_ENTRY = JavaCore
+            .newContainerEntry(new Path("ch.powerunit.POWERUNIT_CONTAINER"));
+
+    public static final PowerUnitContainer DEFAULT = new PowerUnitContainer();
 
     /*
      * (non-Javadoc)
@@ -39,10 +75,10 @@ public class PowerunitClasspathInitializer extends
      * .core.runtime.IPath, org.eclipse.jdt.core.IJavaProject)
      */
     @Override
-    public void initialize(IPath containerPath, IJavaProject project)
+    public void initialize(final IPath containerPath, final IJavaProject project)
             throws CoreException {
-        // TODO Auto-generated method stub
-
+        JavaCore.setClasspathContainer(containerPath,
+                new IJavaProject[] { project },
+                new IClasspathContainer[] { DEFAULT }, null);
     }
-
 }
