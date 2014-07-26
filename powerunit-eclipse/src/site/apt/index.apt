@@ -1,0 +1,5 @@
+PowerUnit Eclipse Integration
+
+ This project is the integration into eclipse of {{{http://www.powerunit.ch}PowerUnit}}.
+ 
+ Please use the update site {{http://dl.bintray.com/powerunit/eclipse-luna/}} to install it.

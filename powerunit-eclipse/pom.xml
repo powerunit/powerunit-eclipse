@@ -23,7 +23,7 @@ This artifact is the eclipse integration</description>
 	</licenses>
 
 	<distributionManagement>
-
+		<downloadUrl>http://dl.bintray.com/powerunit/eclipse-luna/</downloadUrl>
 	</distributionManagement>
 
 	<developers>
@@ -255,11 +255,19 @@ This artifact is the eclipse integration</description>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<version>2.7</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.4</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>distribution-management</report>
+							<report>project-team</report>
+							<report>cim</report>
+							<report>issue-tracking</report>
+							<report>license</report>
+							<report>scm</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>
