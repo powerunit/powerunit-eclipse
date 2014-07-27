@@ -30,6 +30,8 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class PowerUnitResultView extends ViewPart {
 
+    public static final String ID = "ch.powerunit.PowerUnitResultView";//$NON-NLS-1$
+
     /*
      * (non-Javadoc)
      * 

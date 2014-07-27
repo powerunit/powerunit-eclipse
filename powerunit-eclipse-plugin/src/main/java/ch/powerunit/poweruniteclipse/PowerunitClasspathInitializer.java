@@ -48,7 +48,7 @@ public class PowerunitClasspathInitializer extends
 
         @Override
         public String getDescription() {
-            return "PowerUnit";
+            return Messages.PowerunitClasspathInitializer_0;
         }
 
         @Override
@@ -62,8 +62,11 @@ public class PowerunitClasspathInitializer extends
         }
     }
 
+    public static final IPath POWERUNIT_PATH = new Path(
+            "ch.powerunit.POWERUNIT_CONTAINER"); //$NON-NLS-1$
+
     public static final IClasspathEntry POWERUNIT_ENTRY = JavaCore
-            .newContainerEntry(new Path("ch.powerunit.POWERUNIT_CONTAINER"));
+            .newContainerEntry(POWERUNIT_PATH);
 
     public static final PowerUnitContainer DEFAULT = new PowerUnitContainer();
 

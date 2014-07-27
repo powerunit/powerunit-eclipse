@@ -44,7 +44,7 @@ public class Activator extends AbstractUIPlugin {
     private Bundle powerunitBundle;
 
     public static final ImageDescriptor POWERUNIT_ICON = ImageDescriptor
-            .createFromFile(Activator.class, "logo.gif");
+            .createFromFile(Activator.class, "logo.gif"); //$NON-NLS-1$
 
     /**
      * The constructor
@@ -66,7 +66,7 @@ public class Activator extends AbstractUIPlugin {
         powerunitBundle = Arrays
                 .stream(context.getBundles())
                 .filter(p -> p.getSymbolicName().equals(
-                        "ch.powerunit.powerunit")).findFirst().orElse(null);
+                        "ch.powerunit.powerunit")).findFirst().orElse(null); //$NON-NLS-1$
     }
 
     /*

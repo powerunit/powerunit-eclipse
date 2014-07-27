@@ -19,7 +19,6 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -29,6 +28,7 @@ import org.eclipse.jdt.ui.wizards.IClasspathContainerPage;
 import org.eclipse.jdt.ui.wizards.IClasspathContainerPageExtension;
 import org.eclipse.jdt.ui.wizards.NewElementWizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -41,8 +41,8 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
         implements IClasspathContainerPage, IClasspathContainerPageExtension {
 
     public PowerunitContainerWizardPage() {
-        super("PowerUnit");
-        setTitle("PowerUnit Library");
+        super(Messages.PowerunitContainerWizardPage_0);
+        setTitle(Messages.PowerunitContainerWizardPage_1);
         setImageDescriptor(Activator.POWERUNIT_ICON);
     }
 
@@ -54,8 +54,20 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
         GridLayout topLayout = new GridLayout();
         topLayout.numColumns = 1;
         comp.setLayout(topLayout);
+
         Label t = new Label(comp, SWT.SINGLE);
-        t.setText("This is the internal library providing the PowerUnit support");
+        t.setText(Messages.PowerunitContainerWizardPage_2);
+
+        Label separator = new Label(comp, SWT.HORIZONTAL | SWT.SEPARATOR);
+        separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+        Label t2 = new Label(comp, SWT.WRAP);
+        GridData text1LData = new GridData();
+        text1LData.horizontalAlignment = GridData.FILL;
+        text1LData.grabExcessHorizontalSpace = true;
+        text1LData.widthHint = 161;
+        t2.setLayoutData(text1LData);
+        t2.setText(Messages.PowerunitContainerWizardPage_3);
     }
 
     private IJavaProject project;
@@ -82,8 +94,8 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
 
     @Override
     public IClasspathEntry getSelection() {
-        return JavaCore.newContainerEntry(new Path(
-                "ch.powerunit.POWERUNIT_CONTAINER"));
+        return JavaCore
+                .newContainerEntry(PowerunitClasspathInitializer.POWERUNIT_PATH);
     }
 
     @Override

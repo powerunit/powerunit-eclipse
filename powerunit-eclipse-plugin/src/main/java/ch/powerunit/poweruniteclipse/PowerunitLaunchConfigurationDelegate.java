@@ -43,6 +43,8 @@ import org.eclipse.ui.PlatformUI;
 public class PowerunitLaunchConfigurationDelegate extends
         AbstractJavaLaunchConfigurationDelegate {
 
+    private static final String CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER = "ch.powerunit.PowerUnitMainRunner"; //$NON-NLS-1$
+
     @Override
     public void launch(ILaunchConfiguration configuration, String mode,
             ILaunch launch, IProgressMonitor monitor) throws CoreException {
@@ -53,7 +55,7 @@ public class PowerunitLaunchConfigurationDelegate extends
 
         Path p = null;
         try {
-            p = Files.createTempDirectory("powerunit");
+            p = Files.createTempDirectory("powerunit"); //$NON-NLS-1$
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -69,12 +71,12 @@ public class PowerunitLaunchConfigurationDelegate extends
 
         // Create VM config
         VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
-                "ch.powerunit.PowerUnitMainRunner", classpath);
+                CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER, classpath);
         runConfig.setEnvironment(getEnvironment(configuration));
         runConfig.setProgramArguments(new String[] {
                 p.toFile().getAbsolutePath(),
                 getProgramArguments(configuration) });
-        if (!"".equals(getVMArguments(configuration))) {
+        if (!"".equals(getVMArguments(configuration))) { //$NON-NLS-1$
             runConfig
                     .setVMArguments(new String[] { getVMArguments(configuration) });
         }
@@ -94,20 +96,16 @@ public class PowerunitLaunchConfigurationDelegate extends
             } catch (InterruptedException e) {
 
             }
-            Display.getDefault()
-                    .asyncExec(
-                            () -> {
-                                try {
-                                    PlatformUI
-                                            .getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage()
-                                            .showView(
-                                                    "ch.powerunit.PowerUnitResultView");
-                                } catch (Exception e) {
+            Display.getDefault().asyncExec(
+                    () -> {
+                        try {
+                            PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getActivePage()
+                                    .showView(PowerUnitResultView.ID);
+                        } catch (Exception e) {
 
-                                }
-                            });
+                        }
+                    });
         }
     }
 }

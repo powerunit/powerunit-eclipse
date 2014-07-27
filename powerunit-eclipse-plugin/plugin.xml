@@ -134,7 +134,7 @@
 	</category>
   	<view
          id="ch.powerunit.PowerUnitResultView" 
-         name="PowerUnit Result" 
+         name="%resultView.name" 
          category="ch.powerunit.PowerUnitCategory" 
          icon="./icons/logo.gif"
          class="ch.powerunit.poweruniteclipse.PowerUnitResultView">

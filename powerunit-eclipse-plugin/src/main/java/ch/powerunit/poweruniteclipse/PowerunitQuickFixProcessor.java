@@ -103,9 +103,9 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
             ICompilationUnit unit = context.getCompilationUnit();
             String s = unit.getBuffer().getText(location.getOffset(),
                     location.getLength());
-            if ("Test".equals(s) || "TestSuite".equals(s)) {
+            if ("Test".equals(s) || "TestSuite".equals(s)) { //$NON-NLS-1$ //$NON-NLS-2$
 
-                String qualifiedName = "ch.powerunit." + s;
+                String qualifiedName = "ch.powerunit." + s; //$NON-NLS-1$
 
                 IJavaProject javaProject = unit.getJavaProject();
                 if (javaProject.findType(qualifiedName) != null) {
