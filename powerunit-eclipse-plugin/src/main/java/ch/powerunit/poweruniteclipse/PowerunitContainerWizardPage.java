@@ -42,6 +42,8 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
 
     public PowerunitContainerWizardPage() {
         super("PowerUnit");
+        setTitle("PowerUnit Library");
+        setImageDescriptor(Activator.POWERUNIT_ICON);
     }
 
     @Override
@@ -50,9 +52,9 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
         setControl(comp);
 
         GridLayout topLayout = new GridLayout();
-        topLayout.numColumns = 2;
+        topLayout.numColumns = 1;
         comp.setLayout(topLayout);
-        Label t = new Label(comp, SWT.SINGLE | SWT.BORDER);
+        Label t = new Label(comp, SWT.SINGLE);
         t.setText("This is the internal library providing the PowerUnit support");
     }
 

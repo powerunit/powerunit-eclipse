@@ -33,6 +33,8 @@ import org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author borettim
@@ -84,5 +86,28 @@ public class PowerunitLaunchConfigurationDelegate extends
 
         // Launch the configuration
         runner.run(runConfig, launch, monitor);
+
+        //
+        while (!launch.isTerminated()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+
+            }
+            Display.getDefault()
+                    .asyncExec(
+                            () -> {
+                                try {
+                                    PlatformUI
+                                            .getWorkbench()
+                                            .getActiveWorkbenchWindow()
+                                            .getActivePage()
+                                            .showView(
+                                                    "ch.powerunit.PowerUnitResultView");
+                                } catch (Exception e) {
+
+                                }
+                            });
+        }
     }
 }

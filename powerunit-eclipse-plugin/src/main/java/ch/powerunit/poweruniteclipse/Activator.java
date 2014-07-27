@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -41,6 +42,9 @@ public class Activator extends AbstractUIPlugin {
     private static Activator plugin;
 
     private Bundle powerunitBundle;
+
+    public static final ImageDescriptor POWERUNIT_ICON = ImageDescriptor
+            .createFromFile(Activator.class, "logo.gif");
 
     /**
      * The constructor
