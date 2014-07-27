@@ -32,6 +32,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 
 /**
  * @author borettim
@@ -52,22 +53,51 @@ public class PowerunitContainerWizardPage extends NewElementWizardPage
         setControl(comp);
 
         GridLayout topLayout = new GridLayout();
-        topLayout.numColumns = 1;
+        topLayout.numColumns = 2;
         comp.setLayout(topLayout);
 
         Label t = new Label(comp, SWT.SINGLE);
         t.setText(Messages.PowerunitContainerWizardPage_2);
-
-        Label separator = new Label(comp, SWT.HORIZONTAL | SWT.SEPARATOR);
-        separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-        Label t2 = new Label(comp, SWT.WRAP);
         GridData text1LData = new GridData();
         text1LData.horizontalAlignment = GridData.FILL;
         text1LData.grabExcessHorizontalSpace = true;
-        text1LData.widthHint = 161;
+        text1LData.horizontalSpan = 2;
+        t.setLayoutData(text1LData);
+
+        Label separator = new Label(comp, SWT.HORIZONTAL | SWT.SEPARATOR);
+        separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        text1LData = new GridData();
+        text1LData.horizontalAlignment = GridData.FILL;
+        text1LData.grabExcessHorizontalSpace = true;
+        text1LData.horizontalSpan = 2;
+        separator.setLayoutData(text1LData);
+
+        Label t2 = new Label(comp, SWT.WRAP);
+        text1LData = new GridData();
+        text1LData.horizontalAlignment = GridData.FILL;
+        text1LData.grabExcessHorizontalSpace = true;
         t2.setLayoutData(text1LData);
         t2.setText(Messages.PowerunitContainerWizardPage_3);
+        text1LData = new GridData();
+        text1LData.horizontalAlignment = GridData.FILL;
+        text1LData.grabExcessHorizontalSpace = true;
+        text1LData.horizontalSpan = 2;
+        t2.setLayoutData(text1LData);
+
+        separator = new Label(comp, SWT.HORIZONTAL | SWT.SEPARATOR);
+        separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        text1LData = new GridData();
+        text1LData.horizontalAlignment = GridData.FILL;
+        text1LData.grabExcessHorizontalSpace = true;
+        text1LData.horizontalSpan = 2;
+        separator.setLayoutData(text1LData);
+
+        Label t3 = new Label(comp, SWT.SINGLE);
+        t3.setText(Messages.PowerunitContainerWizardPage_4);
+        Text t4 = new Text(comp, SWT.SINGLE);
+        t4.setEditable(false);
+        t4.setText(Activator.getDefault().getPowerUnitPath().toString());
+
     }
 
     private IJavaProject project;

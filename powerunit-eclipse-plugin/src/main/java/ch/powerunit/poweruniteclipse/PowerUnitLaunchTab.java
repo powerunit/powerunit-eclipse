@@ -250,8 +250,7 @@ public class PowerUnitLaunchTab extends JavaLaunchTab {
      */
     @Override
     public Image getImage() {
-        // TODO Auto-generated method stub
-        return super.getImage();
+        return Activator.POWERUNIT_IMAGE;
     }
 
     @Override

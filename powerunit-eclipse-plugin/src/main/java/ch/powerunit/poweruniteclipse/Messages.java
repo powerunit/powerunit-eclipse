@@ -9,6 +9,7 @@ public class Messages extends NLS {
     public static String PowerunitContainerWizardPage_1;
     public static String PowerunitContainerWizardPage_2;
     public static String PowerunitContainerWizardPage_3;
+    public static String PowerunitContainerWizardPage_4;
     public static String PowerUnitLaunchTab_PowerUnitLaunchTab_name;
     static {
         // initialize resource bundle
