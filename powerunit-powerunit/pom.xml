@@ -33,6 +33,12 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 			<version>0.1.0</version>
 			<classifier>sources</classifier>
 		</dependency>
+		<dependency>
+			<groupId>ch.powerunit</groupId>
+			<artifactId>powerunit-with-dependencies</artifactId>
+			<version>0.1.0</version>
+			<classifier>javadoc</classifier>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -19,10 +19,14 @@
  */
 package ch.powerunit.poweruniteclipse;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ClasspathContainerInitializer;
+import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -39,7 +43,13 @@ public class PowerunitClasspathInitializer extends
             IClasspathContainer {
         private IClasspathEntry powerunit = JavaCore.newLibraryEntry(Activator
                 .getDefault().getPowerUnitPath(), Activator.getDefault()
-                .getPowerUnitPath(), null);
+                .getPowerUnitPath(), null, new IAccessRule[0],
+                new IClasspathAttribute[] { JavaCore.newClasspathAttribute(
+                        IClasspathAttribute.JAVADOC_LOCATION_ATTRIBUTE_NAME,
+                        "jar:"
+                                + new File(Activator.getDefault()
+                                        .getPowerUnitPath().toString()).toURI()
+                                        .toString() + "!/") }, false);
 
         @Override
         public IClasspathEntry[] getClasspathEntries() {
