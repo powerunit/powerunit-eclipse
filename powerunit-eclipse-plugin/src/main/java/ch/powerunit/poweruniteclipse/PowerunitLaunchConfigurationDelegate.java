@@ -26,6 +26,9 @@ import java.nio.file.Path;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
@@ -89,23 +92,30 @@ public class PowerunitLaunchConfigurationDelegate extends
         // Launch the configuration
         runner.run(runConfig, launch, monitor);
 
-        //
-        while (!launch.isTerminated()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+        new Job("Waiting test result") {
 
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+                while (!launch.isTerminated()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+
+                    }
+                }
+                Display.getDefault().asyncExec(
+                        () -> {
+                            try {
+                                PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(PowerUnitResultView.ID);
+                            } catch (Exception e) {
+
+                            }
+                        });
+                return Status.OK_STATUS;
             }
-            Display.getDefault().asyncExec(
-                    () -> {
-                        try {
-                            PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .showView(PowerUnitResultView.ID);
-                        } catch (Exception e) {
-
-                        }
-                    });
-        }
+        }.schedule();
     }
 }
