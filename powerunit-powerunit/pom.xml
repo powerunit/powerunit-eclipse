@@ -25,24 +25,48 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 		<dependency>
 			<groupId>ch.powerunit</groupId>
 			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.1.0</version>
+			<version>0.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.powerunit</groupId>
 			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.1.0</version>
+			<version>0.1.1</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
 			<groupId>ch.powerunit</groupId>
 			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.1.0</version>
+			<version>0.1.1</version>
 			<classifier>javadoc</classifier>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>clean source folder</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>src/main/java</directory>
+									<excludes>
+										<exclude>.gitignore</exclude>
+										<exclude>**/.gitignore</exclude>
+									</excludes>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -59,12 +83,25 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
 					</execution>
+					<execution>
+						<id>unpack-dependencies for eclipse integration</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/src/main/java</outputDirectory>
+							<overWriteReleases>true</overWriteReleases>
+							<overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -87,6 +124,25 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 											<goal>
 												unpack-dependencies
 											</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-clean-plugin
+										</artifactId>
+										<versionRange>
+											[2.5,)
+										</versionRange>
+										<goals>
+											<goal>clean</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

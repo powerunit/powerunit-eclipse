@@ -19,10 +19,16 @@
  */
 package ch.powerunit.poweruniteclipse;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
+
+import ch.powerunit.report.Testsuites;
 
 /**
  * @author borettim
@@ -41,12 +47,8 @@ public class PowerUnitResultView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        Composite comp = new Composite(parent, SWT.NONE);
-
-        GridLayout topLayout = new GridLayout();
-        topLayout.numColumns = 2;
-        comp.setLayout(topLayout);
-
+        createDisplay(parent);
+        createToolbar();
     }
 
     /*
@@ -58,6 +60,26 @@ public class PowerUnitResultView extends ViewPart {
     public void setFocus() {
         // TODO Auto-generated method stub
 
+    }
+
+    private void createDisplay(Composite parent) {
+        Composite comp = new Composite(parent, SWT.NONE);
+
+        GridLayout topLayout = new GridLayout();
+        topLayout.numColumns = 2;
+        comp.setLayout(topLayout);
+
+    }
+
+    private void createToolbar() {
+        IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+
+    }
+
+    private Map<String, Testsuites> results = new HashMap<>();
+
+    public void addResult(Testsuites suites) {
+        results.put(suites.getName(), suites);
     }
 
 }

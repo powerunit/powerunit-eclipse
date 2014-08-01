@@ -26,9 +26,6 @@ import java.nio.file.Path;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
@@ -36,8 +33,6 @@ import org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * @author borettim
@@ -92,30 +87,6 @@ public class PowerunitLaunchConfigurationDelegate extends
         // Launch the configuration
         runner.run(runConfig, launch, monitor);
 
-        new Job("Waiting test result") {
-
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                while (!launch.isTerminated()) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-
-                    }
-                }
-                Display.getDefault().asyncExec(
-                        () -> {
-                            try {
-                                PlatformUI.getWorkbench()
-                                        .getActiveWorkbenchWindow()
-                                        .getActivePage()
-                                        .showView(PowerUnitResultView.ID);
-                            } catch (Exception e) {
-
-                            }
-                        });
-                return Status.OK_STATUS;
-            }
-        }.schedule();
+        new PowerUnitWaitTestResult(configuration, launch, p).schedule();
     }
 }

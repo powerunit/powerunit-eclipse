@@ -130,7 +130,7 @@
         point="org.eclipse.ui.views">
 	<category
        id="ch.powerunit.PowerUnitCategory" 
-       name="PowerUnit">
+       name="%resultView.category">
 	</category>
   	<view
          id="ch.powerunit.PowerUnitResultView" 
