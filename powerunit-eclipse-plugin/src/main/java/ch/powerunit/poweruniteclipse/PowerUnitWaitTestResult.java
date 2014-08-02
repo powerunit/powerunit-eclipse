@@ -58,23 +58,37 @@ final class PowerUnitWaitTestResult extends Job {
 
         Testsuites suites = new Testsuites();
         suites.setName(configuration.getName() + " ended at " + new Date());
+        suites.setErrors(0);
+        suites.setFailures(0);
 
         Arrays.stream(
                 temporaryPath.toFile().listFiles(
-                        f -> f.getName().endsWith(".xml"))).forEach(f -> {
-            try {
-                Object o = JAXB_CONTEXT.createUnmarshaller().unmarshal(f);
-                if (o instanceof Testsuite) {
-                    suites.getTestsuite().add((Testsuite) o);
-                } else if (o instanceof Testsuites) {
-                    for (Testsuite s : ((Testsuites) o).getTestsuite()) {
-                        suites.getTestsuite().add(s);
-                    }
-                }
-            } catch (JAXBException e) {
-                // TODO
-            }
-        });
+                        f -> f.getName().endsWith(".xml")))
+                .forEach(
+                        f -> {
+                            try {
+                                Object o = JAXB_CONTEXT.createUnmarshaller()
+                                        .unmarshal(f);
+                                if (o instanceof Testsuite) {
+                                    suites.getTestsuite().add((Testsuite) o);
+                                    suites.setFailures(suites.getFailures()
+                                            + ((Testsuite) o).getFailures());
+                                    suites.setErrors(suites.getErrors()
+                                            + ((Testsuite) o).getErrors());
+                                } else if (o instanceof Testsuites) {
+                                    for (Testsuite s : ((Testsuites) o)
+                                            .getTestsuite()) {
+                                        suites.getTestsuite().add(s);
+                                        suites.setFailures(suites.getFailures()
+                                                + s.getFailures());
+                                        suites.setErrors(suites.getErrors()
+                                                + s.getErrors());
+                                    }
+                                }
+                            } catch (JAXBException e) {
+                                // TODO
+                            }
+                        });
 
         Display.getDefault().asyncExec(
                 () -> {

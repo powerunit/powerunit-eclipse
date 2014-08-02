@@ -49,6 +49,18 @@ public class Activator extends AbstractUIPlugin {
 
     public static final Image POWERUNIT_IMAGE = POWERUNIT_ICON.createImage();
 
+    public static final ImageDescriptor POWERUNIT_ICON_OK = ImageDescriptor
+            .createFromFile(Activator.class, "ok.png"); //$NON-NLS-1$
+
+    public static final Image POWERUNIT_IMAGE_OK = POWERUNIT_ICON_OK
+            .createImage();
+
+    public static final ImageDescriptor POWERUNIT_ICON_KO = ImageDescriptor
+            .createFromFile(Activator.class, "ko.png"); //$NON-NLS-1$
+
+    public static final Image POWERUNIT_IMAGE_KO = POWERUNIT_ICON_KO
+            .createImage();
+
     /**
      * The constructor
      */
