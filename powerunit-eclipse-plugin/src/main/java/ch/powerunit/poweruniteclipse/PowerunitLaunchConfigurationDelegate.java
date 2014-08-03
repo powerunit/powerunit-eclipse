@@ -72,8 +72,7 @@ public class PowerunitLaunchConfigurationDelegate extends
                 CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER, classpath);
         runConfig.setEnvironment(getEnvironment(configuration));
         runConfig.setProgramArguments(new String[] {
-                p.toFile().getAbsolutePath(),
-                getProgramArguments(configuration) });
+                p.toFile().getAbsolutePath(), getMainTypeName(configuration) });
         if (!"".equals(getVMArguments(configuration))) { //$NON-NLS-1$
             runConfig
                     .setVMArguments(new String[] { getVMArguments(configuration) });

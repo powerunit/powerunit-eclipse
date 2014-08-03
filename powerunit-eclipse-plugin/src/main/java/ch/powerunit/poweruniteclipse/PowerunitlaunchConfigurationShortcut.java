@@ -67,7 +67,7 @@ public class PowerunitlaunchConfigurationShortcut extends JavaLaunchShortcut {
                             .getCompilationUnit().getJavaProject()
                             .getElementName());
             wc.setAttribute(
-                    IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
+                    IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
                     type.getFullyQualifiedName());
             config = wc.doSave();
         } catch (CoreException exception) {
