@@ -23,7 +23,7 @@ This artifact is the eclipse integration</description>
 	</licenses>
 
 	<distributionManagement>
-		<downloadUrl>http://dl.bintray.com/powerunit/eclipse-luna/</downloadUrl>
+		<downloadUrl>http://dl.bintray.com/powerunit/eclipse-luna/${project.version}</downloadUrl>
 	</distributionManagement>
 
 	<developers>
