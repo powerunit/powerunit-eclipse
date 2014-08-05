@@ -11,6 +11,9 @@ public class Messages extends NLS {
     public static String PowerunitContainerWizardPage_3;
     public static String PowerunitContainerWizardPage_4;
     public static String PowerUnitLaunchTab_PowerUnitLaunchTab_name;
+    public static String PowerUnitLaunchTabClass_0;
+    public static String PowerUnitLaunchTabClass_1;
+    public static String PowerUnitLaunchTabClass_2;
     public static String PowerUnitLaunchTabProject_1;
     public static String PowerUnitLaunchTabProject_2;
     public static String PowerUnitLaunchTabProject_3;
