@@ -9,5 +9,8 @@
   </poweredBy>
   <body>
     <menu ref="reports" />
+    <menu name="General documentations">
+      <item name="Manual" href="manual.html" />
+    </menu>
   </body>
 </project>

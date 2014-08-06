@@ -1,0 +1,31 @@
+Eclipse Plugin Manual
+
+* Installation
+
+ This plugin requires Java 8 and Eclipse Luna. It can be installed as any Eclipse plugin, by using the 
+ <install new software...> capabilities of Eclipse :
+ 
+** Choose the right menu item
+
+[images/1menu.png] Choose the <install new software...> menu item
+
+** Install the PowerUnit eclipse feature
+
+[images/2install.png] Use the right URL
+
+* Usage
+
+ For this example, a simple java project will be used. It is also possible to use a Maven project (in this case, the 
+ <<<pom.xml>>> must contains the dependencies to <powerunit> artifact.
+ 
+** Install the PowerUnit library
+
+[images/3.lib.png] Add the library to the classpath
+
+** Create a class that use PowerUnit
+
+[images/4.2.class.png] Sample of test class
+
+**Execute the test
+
+[images/5.run.png] Execute

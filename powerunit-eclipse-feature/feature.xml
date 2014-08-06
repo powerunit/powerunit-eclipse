@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="ch.powerunit.eclipse.feature"
-      label="ch.powerunit.eclipse.feature"
+      label="PowerUnit support"
       version="0.0.1.qualifier"
       provider-name="PowerUnit"
       plugin="ch.powerunit.eclipse.plugin">
@@ -1374,6 +1374,9 @@ Public License instead of this License.  But first, please read
       <import plugin="org.eclipse.jdt.debug" version="3.8.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.debug.ui" version="3.6.300" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.ui" version="3.10.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ltk.core.refactoring" version="3.6.100" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jface.text" version="3.9.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ltk.ui.refactoring" version="3.7.100" match="greaterOrEqual"/>
    </requires>
 
    <plugin
