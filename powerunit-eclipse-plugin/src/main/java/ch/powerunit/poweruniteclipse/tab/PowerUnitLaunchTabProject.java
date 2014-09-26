@@ -45,7 +45,7 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 
 import ch.powerunit.poweruniteclipse.Messages;
 import ch.powerunit.poweruniteclipse.PowerUnitLaunchTab;
-import ch.powerunit.poweruniteclipse.SWTHelper;
+import ch.powerunit.poweruniteclipse.helper.SWTHelper;
 
 public final class PowerUnitLaunchTabProject {
 

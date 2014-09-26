@@ -48,7 +48,6 @@ import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.PerformChangeOperation;
 import org.eclipse.ltk.core.refactoring.RefactoringCore;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
-import org.eclipse.ltk.ui.refactoring.RefactoringUI;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.PlatformUI;
@@ -182,8 +181,8 @@ public class PowerunitQuickFixProcessor implements IQuickFixProcessor {
                                 try {
                                     Change change = createChange();
                                     change.initializeValidationData(new NullProgressMonitor());
-                                    PerformChangeOperation op = RefactoringUI
-                                            .createUIAwareChangeOperation(change);
+                                    PerformChangeOperation op = new PerformChangeOperation(
+                                            change);
                                     op.setUndoManager(
                                             RefactoringCore.getUndoManager(),
                                             getDisplayString());

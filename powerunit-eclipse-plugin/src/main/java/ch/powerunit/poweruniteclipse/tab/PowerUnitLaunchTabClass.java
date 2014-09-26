@@ -45,8 +45,6 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
-import org.eclipse.jdt.internal.debug.ui.launcher.DebugTypeSelectionDialog;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -63,7 +61,8 @@ import org.eclipse.swt.widgets.Text;
 
 import ch.powerunit.poweruniteclipse.Messages;
 import ch.powerunit.poweruniteclipse.PowerUnitLaunchTab;
-import ch.powerunit.poweruniteclipse.SWTHelper;
+import ch.powerunit.poweruniteclipse.helper.SWTHelper;
+import ch.powerunit.poweruniteclipse.helper.TypeSelectionDialog;
 
 /**
  * @author borettim
@@ -125,7 +124,7 @@ public final class PowerUnitLaunchTabClass {
                 try {
                     elements = model.getJavaProjects();
                 } catch (JavaModelException e) {
-                    JDIDebugUIPlugin.log(e);
+                    // TODO
                 }
             }
         } else {
@@ -151,7 +150,7 @@ public final class PowerUnitLaunchTabClass {
             return;
         }
 
-        DebugTypeSelectionDialog mmsd = new DebugTypeSelectionDialog(
+        TypeSelectionDialog mmsd = new TypeSelectionDialog(
                 this.parent.getShell(), types,
                 Messages.PowerUnitLaunchTabClass_1);
         if (mmsd.open() == Window.CANCEL) {
@@ -198,7 +197,7 @@ public final class PowerUnitLaunchTabClass {
             new SearchEngine().search(pattern, participants, scope, collector,
                     searchMonitor);
         } catch (CoreException ce) {
-            JDIDebugUIPlugin.log(ce);
+            // TODO
         }
 
         List<IType> result = collector.getResult();
@@ -268,7 +267,7 @@ public final class PowerUnitLaunchTabClass {
                     IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
                     EMPTY_STRING);
         } catch (CoreException ce) {
-            JDIDebugUIPlugin.log(ce);
+            // TODO
         }
         fClazzText.setText(clazzName);
     }
