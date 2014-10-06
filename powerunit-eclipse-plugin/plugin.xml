@@ -54,11 +54,10 @@
                      <and>
                      	<test property="org.eclipse.jdt.launching.extendsInterface" args="ch.powerunit.TestSuite"/>
                      </and>
-                     <!--
 					 <and>
 					 	<test property="org.eclipse.jdt.launching.isContainer"/>
 					 	<test property="org.eclipse.jdt.launching.hasProjectNature" args="org.eclipse.jdt.core.javanature"/>
-					 </and>-->
+					 </and>
 					</or>
 				  </iterate>
 				 </with>

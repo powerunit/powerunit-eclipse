@@ -30,6 +30,7 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaLaunchShortcut;
 import org.eclipse.jdt.internal.core.CompilationUnit;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
 import org.eclipse.jdt.internal.debug.ui.launcher.LauncherMessages;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
@@ -81,7 +82,11 @@ public class PowerunitlaunchConfigurationShortcut extends JavaLaunchShortcut {
     @Override
     protected IType[] findTypes(Object[] elements, IRunnableContext context)
             throws InterruptedException, CoreException {
-        CompilationUnit cu = (CompilationUnit) elements[0];
+        if (elements[0] instanceof JavaProject) {
+
+        }
+        CompilationUnit cu = (CompilationUnit) elements[0];// TODO support
+                                                           // JavaProject
         IType type = Arrays.stream(cu.getAllTypes()).findFirst().orElse(null);
         return new IType[] { type };
     }

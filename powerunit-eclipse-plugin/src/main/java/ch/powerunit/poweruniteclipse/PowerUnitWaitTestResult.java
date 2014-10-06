@@ -88,7 +88,9 @@ final class PowerUnitWaitTestResult extends Job {
                             } catch (JAXBException e) {
                                 // TODO
                             }
+                            f.delete();
                         });
+        temporaryPath.toFile().delete();
 
         Display.getDefault().asyncExec(
                 () -> {

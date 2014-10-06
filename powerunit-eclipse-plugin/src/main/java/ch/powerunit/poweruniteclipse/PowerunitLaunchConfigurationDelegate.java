@@ -21,6 +21,7 @@ package ch.powerunit.poweruniteclipse;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -29,10 +30,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.launching.AbstractJavaLaunchConfigurationDelegate;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.IVMRunner;
 import org.eclipse.jdt.launching.VMRunnerConfiguration;
+import org.eclipse.ui.internal.progress.ProgressManager;
+
+import ch.powerunit.poweruniteclipse.helper.TestClassSearch;
 
 /**
  * @author borettim
@@ -67,12 +72,32 @@ public class PowerunitLaunchConfigurationDelegate extends
 
         String classpath[] = getClasspath(configuration);
 
+        String mainTypes = getMainTypeName(configuration);
+        if (mainTypes == null || "".equalsIgnoreCase(mainTypes.trim())) {
+            try {
+                IType[] types = TestClassSearch
+                        .searchTestSuiteClazzFromProject(
+                                ProgressManager.getInstance(), project);
+                StringBuilder sb = new StringBuilder();
+                for (IType t : types) {
+                    sb.append(t.getFullyQualifiedName()).append(",");
+                }
+                mainTypes = sb.toString().replaceAll(",$", "");
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
         // Create VM config
         VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
                 CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER, classpath);
         runConfig.setEnvironment(getEnvironment(configuration));
         runConfig.setProgramArguments(new String[] {
-                p.toFile().getAbsolutePath(), getMainTypeName(configuration) });
+                p.toFile().getAbsolutePath(), mainTypes });
         if (!"".equals(getVMArguments(configuration))) { //$NON-NLS-1$
             runConfig
                     .setVMArguments(new String[] { getVMArguments(configuration) });

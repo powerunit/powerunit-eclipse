@@ -19,8 +19,8 @@
  */
 package ch.powerunit.poweruniteclipse;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -146,7 +146,8 @@ public class PowerUnitResultView extends ViewPart {
 
     }
 
-    private Map<String, Testsuites> results = new HashMap<>();
+    private Map<String, Testsuites> results = new TreeMap<>((String c1,
+            String c2) -> c1.compareTo(c2));
 
     public void addResult(Testsuites suites) {
         results.put(suites.getName(), suites);
