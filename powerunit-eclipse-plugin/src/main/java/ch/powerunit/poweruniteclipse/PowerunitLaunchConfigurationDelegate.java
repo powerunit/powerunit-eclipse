@@ -44,73 +44,100 @@ import ch.powerunit.poweruniteclipse.helper.TestClassSearch;
  *
  */
 public class PowerunitLaunchConfigurationDelegate extends
-        AbstractJavaLaunchConfigurationDelegate {
+		AbstractJavaLaunchConfigurationDelegate {
 
-    private static final String CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER = "ch.powerunit.PowerUnitMainRunner"; //$NON-NLS-1$
+	public static final String CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER = "ch.powerunit.PowerUnitMainRunner"; //$NON-NLS-1$
 
-    @Override
-    public void launch(ILaunchConfiguration configuration, String mode,
-            ILaunch launch, IProgressMonitor monitor) throws CoreException {
-        IJavaProject project = verifyJavaProject(configuration);
+	public static final String PACKAGE_FRAGMENT_NAME = PowerunitLaunchConfigurationDelegate.class
+			+ ".packagefragment";
 
-        IVMInstall vm = verifyVMInstall(configuration);
-        IVMRunner runner = vm.getVMRunner(mode);
+	public static final String PACKAGE_FRAGMENT_ROOT_NAME = PowerunitLaunchConfigurationDelegate.class
+			+ ".packagefragmentRoot";
 
-        Path p = null;
-        try {
-            p = Files.createTempDirectory("powerunit"); //$NON-NLS-1$
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	@Override
+	public void launch(ILaunchConfiguration configuration, String mode,
+			ILaunch launch, IProgressMonitor monitor) throws CoreException {
+		IJavaProject project = verifyJavaProject(configuration);
 
-        File workingDir = verifyWorkingDirectory(configuration);
-        String workingDirName = null;
-        if (workingDir != null) {
-            workingDirName = workingDir.getAbsolutePath();
-        }
+		IVMInstall vm = verifyVMInstall(configuration);
+		IVMRunner runner = vm.getVMRunner(mode);
 
-        String classpath[] = getClasspath(configuration);
+		Path p = null;
+		try {
+			p = Files.createTempDirectory("powerunit"); //$NON-NLS-1$
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
-        String mainTypes = getMainTypeName(configuration);
-        if (mainTypes == null || "".equalsIgnoreCase(mainTypes.trim())) {
-            try {
-                IType[] types = TestClassSearch
-                        .searchTestSuiteClazzFromProject(
-                                ProgressManager.getInstance(), project);
-                StringBuilder sb = new StringBuilder();
-                for (IType t : types) {
-                    sb.append(t.getFullyQualifiedName()).append(",");
-                }
-                mainTypes = sb.toString().replaceAll(",$", "");
-            } catch (InvocationTargetException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+		File workingDir = verifyWorkingDirectory(configuration);
+		String workingDirName = null;
+		if (workingDir != null) {
+			workingDirName = workingDir.getAbsolutePath();
+		}
 
-        // Create VM config
-        VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
-                CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER, classpath);
-        runConfig.setEnvironment(getEnvironment(configuration));
-        runConfig.setProgramArguments(new String[] {
-                p.toFile().getAbsolutePath(), mainTypes });
-        if (!"".equals(getVMArguments(configuration))) { //$NON-NLS-1$
-            runConfig
-                    .setVMArguments(new String[] { getVMArguments(configuration) });
-        }
-        runConfig.setWorkingDirectory(workingDirName);
+		String classpath[] = getClasspath(configuration);
 
-        // Bootpath
-        String[] bootpath = getBootpath(configuration);
-        runConfig.setBootClassPath(bootpath);
+		String mainTypes = getMainTypeName(configuration);
+		String packageFragment = configuration.getAttribute(
+				PACKAGE_FRAGMENT_NAME, "");
+		String packageFragmentRoot = configuration.getAttribute(
+				PACKAGE_FRAGMENT_ROOT_NAME, "");
 
-        // Launch the configuration
-        runner.run(runConfig, launch, monitor);
+		if (mainTypes == null || "".equalsIgnoreCase(mainTypes.trim())) {
+			IType[] types = null;
+			try {
+				if (packageFragment != null
+						&& !"".equalsIgnoreCase(packageFragment.trim())) {
+					types = TestClassSearch
+							.searchTestSuiteClazzFromPackageFragment(
+									ProgressManager.getInstance(),
+									project.findPackageFragmentRoot(
+											project.getPath().append(
+													packageFragmentRoot))
+											.getPackageFragment(packageFragment));
+				} else if (packageFragmentRoot != null
+						&& !"".equalsIgnoreCase(packageFragmentRoot.trim())) {
+					types = TestClassSearch
+							.searchTestSuiteClazzFromPackageFragmentRoot(
+									ProgressManager.getInstance(),
+									project.findPackageFragmentRoot(project
+											.getPath().append(
+													packageFragmentRoot)));
+				} else {
+					types = TestClassSearch.searchTestSuiteClazzFromProject(
+							ProgressManager.getInstance(), project);
+				}
+				StringBuilder sb = new StringBuilder();
+				for (IType t : types) {
+					sb.append(t.getFullyQualifiedName()).append(",");
+				}
+				mainTypes = sb.toString().replaceAll(",$", "");
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 
-        new PowerUnitWaitTestResult(configuration, launch, p).schedule();
-    }
+		// Create VM config
+		VMRunnerConfiguration runConfig = new VMRunnerConfiguration(
+				CH_POWERUNIT_POWER_UNIT_MAIN_RUNNER, classpath);
+		runConfig.setEnvironment(getEnvironment(configuration));
+		runConfig.setProgramArguments(new String[] {
+				p.toFile().getAbsolutePath(), mainTypes });
+		if (!"".equals(getVMArguments(configuration))) { //$NON-NLS-1$
+			runConfig
+					.setVMArguments(new String[] { getVMArguments(configuration) });
+		}
+		runConfig.setWorkingDirectory(workingDirName);
+
+		// Bootpath
+		String[] bootpath = getBootpath(configuration);
+		runConfig.setBootClassPath(bootpath);
+
+		// Launch the configuration
+		runner.run(runConfig, launch, monitor);
+
+		new PowerUnitWaitTestResult(configuration, launch, p).schedule();
+	}
 }

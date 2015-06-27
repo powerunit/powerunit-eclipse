@@ -1,0 +1,6 @@
+<factorypath>
+    <factorypathentry kind="VARJAR" id="M2_REPO/ch/powerunit/powerunit-with-dependencies/0.2.0/powerunit-with-dependencies-0.2.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/ch/powerunit/powerunit-with-dependencies/0.2.0/powerunit-with-dependencies-0.2.0-sources.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/ch/powerunit/powerunit-with-dependencies/0.2.0/powerunit-with-dependencies-0.2.0-javadoc.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
+</factorypath>

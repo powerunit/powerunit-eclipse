@@ -47,18 +47,7 @@
 				<with variable="selection">
 				 <count value="1"/>
 				  <iterate>
-				   <or>
-				   	<!--
-					 <test property="org.eclipse.jdt.launching.isPackageFragment"/>
-                     <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>-->
-                     <and>
-                     	<test property="org.eclipse.jdt.launching.extendsInterface" args="ch.powerunit.TestSuite"/>
-                     </and>
-					 <and>
-					 	<test property="org.eclipse.jdt.launching.isContainer"/>
-					 	<test property="org.eclipse.jdt.launching.hasProjectNature" args="org.eclipse.jdt.core.javanature"/>
-					 </and>
-					</or>
+                     <test property="org.eclipse.jdt.launching.extendsInterface" args="ch.powerunit.TestSuite"/>
 				  </iterate>
 				 </with>
 			</enablement>
@@ -68,7 +57,115 @@
 		</configurationType>
     </shortcut>
   </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="ch.powerunit.launcher.shortcut.project"
+        class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationProjectShortcut"
+        label="%shortcut.label"
+        icon="./icons/logo.gif"
+        modes="run, debug">
+        <description
+     		description="%description.description"
+     		mode="run">
+    	</description>
+	    <description
+	     	description="%description.description.0"
+	     	mode="debug">
+	    </description>
+	    <contextualLaunch>
+			<enablement>
+				<with variable="selection">
+				 <count value="1"/>
+				  <iterate>
+				   	<and>
+				   	 <not>
+				   	  <test property="org.eclipse.jdt.launching.isPackageFragment"/>
+				   	 </not>
+				   	 <not>
+				   	  <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>
+				   	 </not>
+					 <test property="org.eclipse.jdt.launching.isContainer"/>
+					 <test property="org.eclipse.jdt.launching.hasProjectNature" args="org.eclipse.jdt.core.javanature"/>
+					</and>
+				 </iterate>
+				</with>
+			</enablement>
+		</contextualLaunch>
+		<configurationType
+			id="ch.powerunit.launcher">
+		</configurationType>
+    </shortcut>
+  </extension>
 
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="ch.powerunit.launcher.shortcut.root"
+        class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationPackageFragmentRootShortcut"
+        label="%shortcut.label"
+        icon="./icons/logo.gif"
+        modes="run, debug">
+        <description
+     		description="%description.description"
+     		mode="run">
+    	</description>
+	    <description
+	     	description="%description.description.0"
+	     	mode="debug">
+	    </description>
+	    <contextualLaunch>
+			<enablement>
+				<with variable="selection">
+				 <count value="1"/>
+				  <iterate>
+				   	<and>
+				   	 <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>
+					</and>
+				 </iterate>
+				</with>
+			</enablement>
+		</contextualLaunch>
+		<configurationType
+			id="ch.powerunit.launcher">
+		</configurationType>
+    </shortcut>
+  </extension>
+  
+  <extension point="org.eclipse.debug.ui.launchShortcuts">
+    <shortcut
+        id="ch.powerunit.launcher.shortcut.package"
+        class="ch.powerunit.poweruniteclipse.PowerunitlaunchConfigurationPackageFragmentShortcut"
+        label="%shortcut.label"
+        icon="./icons/logo.gif"
+        modes="run, debug">
+        <description
+     		description="%description.description"
+     		mode="run">
+    	</description>
+	    <description
+	     	description="%description.description.0"
+	     	mode="debug">
+	    </description>
+	    <contextualLaunch>
+			<enablement>
+				<with variable="selection">
+				 <count value="1"/>
+				  <iterate>
+				   	<and>
+				   	 <test property="org.eclipse.jdt.launching.isPackageFragment"/>
+				   	 <not>
+				   	   <test property="org.eclipse.jdt.launching.isPackageFragmentRoot"/>
+				   	 </not>
+					</and>
+				 </iterate>
+				</with>
+			</enablement>
+		</contextualLaunch>
+		<configurationType
+			id="ch.powerunit.launcher">
+		</configurationType>
+    </shortcut>
+  </extension>
 
   <extension point = "org.eclipse.debug.ui.launchGroups">
 	<launchGroup
@@ -91,7 +188,13 @@
    <classpathContainerInitializer                                          
       id="ch.powerunit.POWERUNIT_CONTAINER"                                                        
       class="ch.powerunit.poweruniteclipse.PowerunitClasspathInitializer"/>                           
-</extension>
+  </extension>
+  
+  <extension point="org.eclipse.jdt.core.classpathContainerInitializer">            
+   <classpathContainerInitializer                                          
+      id="ch.powerunit.POWERUNITEXTENSIONS_CONTAINER"                                                        
+      class="ch.powerunit.poweruniteclipse.PowerunitExtensionsClasspathInitializer"/>                           
+  </extension>
   
   <extension point="org.eclipse.jdt.ui.classpathContainerPage">
     <classpathContainerPage
@@ -101,11 +204,34 @@
     </classpathContainerPage>
   </extension>
   
+  <extension point="org.eclipse.jdt.ui.classpathContainerPage">
+    <classpathContainerPage
+        name="%classpathExtensionsContainerPage.name"
+        class="ch.powerunit.poweruniteclipse.PowerunitExtensionsContainerWizardPage"
+        id="ch.powerunit.POWERUNITEXTENSIONS_CONTAINER">
+    </classpathContainerPage>
+  </extension>
+  
   <extension point="org.eclipse.jdt.ui.quickFixProcessors">
     <quickFixProcessor
           class="ch.powerunit.poweruniteclipse.PowerunitQuickFixProcessor"
           id="ch.powerunit.QuickFixProcessor"
           name="%quickFixProcessor.name">
+    	<enablement>
+	      <with variable="projectNatures">
+	         <iterate operator="or">
+	            <equals value="org.eclipse.jdt.core.javanature"/>
+	         </iterate>
+	      </with>
+   		</enablement>
+    </quickFixProcessor>
+  </extension>
+  
+  <extension point="org.eclipse.jdt.ui.quickFixProcessors">
+    <quickFixProcessor
+          class="ch.powerunit.poweruniteclipse.PowerunitExtensionsQuickFixProcessor"
+          id="ch.powerunit.ExtensionsQuickFixProcessor"
+          name="%extensionsQuickFixProcessor.name">
     	<enablement>
 	      <with variable="projectNatures">
 	         <iterate operator="or">
@@ -125,6 +251,16 @@
         </overrides>
     </classpathFixProcessor>
   </extension>
+  <extension point="org.eclipse.jdt.ui.classpathFixProcessors">
+    <classpathFixProcessor
+        name="%classpathExtensionsFixProcessor.name"
+        class="ch.powerunit.poweruniteclipse.PowerunitExtensionsClasspathFixProcessor"
+        id="ch.powerunit.ClasspathExtensionsFixProcessor">
+        <overrides id="org.eclipse.jdt.ui.text.correction.DefaultClasspathFixProcessor">
+        </overrides>
+    </classpathFixProcessor>
+  </extension>
+  
   <extension
         point="org.eclipse.ui.views">
 	<category

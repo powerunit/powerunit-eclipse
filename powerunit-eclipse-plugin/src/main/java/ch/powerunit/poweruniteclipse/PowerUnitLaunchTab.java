@@ -31,6 +31,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import ch.powerunit.poweruniteclipse.tab.PowerUnitLaunchTabClass;
+import ch.powerunit.poweruniteclipse.tab.PowerUnitLaunchTabPackageFragment;
+import ch.powerunit.poweruniteclipse.tab.PowerUnitLaunchTabPackageFragmentRoot;
 import ch.powerunit.poweruniteclipse.tab.PowerUnitLaunchTabProject;
 
 /**
@@ -39,91 +41,110 @@ import ch.powerunit.poweruniteclipse.tab.PowerUnitLaunchTabProject;
  */
 public class PowerUnitLaunchTab extends JavaLaunchTab {
 
-    protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
+	protected static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-    private final PowerUnitLaunchTabProject project = new PowerUnitLaunchTabProject(
-            this);
+	private final PowerUnitLaunchTabProject project = new PowerUnitLaunchTabProject(
+			this);
 
-    private final PowerUnitLaunchTabClass clazz = new PowerUnitLaunchTabClass(
-            this, project);
+	private final PowerUnitLaunchTabPackageFragmentRoot packageFragmentRoot = new PowerUnitLaunchTabPackageFragmentRoot(
+			this, project);
 
-    @Override
-    public void updateLaunchConfigurationDialog() {
-        super.updateLaunchConfigurationDialog();
-    }
+	private final PowerUnitLaunchTabPackageFragment packageFragment = new PowerUnitLaunchTabPackageFragment(
+			this, project, packageFragmentRoot);
 
-    @Override
-    public Shell getShell() {
-        return super.getShell();
-    }
+	private final PowerUnitLaunchTabClass clazz = new PowerUnitLaunchTabClass(
+			this, packageFragmentRoot, packageFragment, project);
 
-    @Override
-    public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
-        return super.getLaunchConfigurationDialog();
-    }
+	@Override
+	public void updateLaunchConfigurationDialog() {
+		super.updateLaunchConfigurationDialog();
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
-     * .debug.core.ILaunchConfiguration)
-     */
-    @Override
-    public void initializeFrom(ILaunchConfiguration config) {
-        project.updateProjectFromConfig(config);
-        clazz.updateClazzFromConfig(config);
-        super.initializeFrom(config);
-    }
+	@Override
+	public Shell getShell() {
+		return super.getShell();
+	}
 
-    @Override
-    public String getName() {
-        return Messages.PowerUnitLaunchTab_PowerUnitLaunchTab_name;
-    }
+	@Override
+	public ILaunchConfigurationDialog getLaunchConfigurationDialog() {
+		return super.getLaunchConfigurationDialog();
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
-     */
-    @Override
-    public Image getImage() {
-        return Activator.POWERUNIT_IMAGE;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.debug.ui.ILaunchConfigurationTab#initializeFrom(org.eclipse
+	 * .debug.core.ILaunchConfiguration)
+	 */
+	@Override
+	public void initializeFrom(ILaunchConfiguration config) {
+		project.updateProjectFromConfig(config);
+		packageFragmentRoot.updateFragmentFromConfig(config);
+		packageFragment.updateFragmentFromConfig(config);
+		clazz.updateClazzFromConfig(config);
+		super.initializeFrom(config);
+	}
 
-    @Override
-    public void createControl(Composite parent) {
+	@Override
+	public String getName() {
+		return Messages.PowerUnitLaunchTab_PowerUnitLaunchTab_name;
+	}
 
-        Composite comp = new Composite(parent, SWT.NONE);
-        setControl(comp);
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.debug.ui.AbstractLaunchConfigurationTab#getImage()
+	 */
+	@Override
+	public Image getImage() {
+		return Activator.POWERUNIT_IMAGE;
+	}
 
-        GridLayout topLayout = new GridLayout();
-        topLayout.numColumns = 1;
-        comp.setLayout(topLayout);
+	@Override
+	public void createControl(Composite parent) {
 
-        project.createProjectEditor(comp);
+		Composite comp = new Composite(parent, SWT.NONE);
+		setControl(comp);
 
-        clazz.createClassEditor(comp, "Class to be tested");
-    }
+		GridLayout topLayout = new GridLayout();
+		topLayout.numColumns = 1;
+		comp.setLayout(topLayout);
 
-    @Override
-    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
-        IJavaElement je = getContext();
-        if (je != null) {
-            initializeDefaults(je, configuration);
-        }
-    }
+		project.createProjectEditor(comp);
 
-    @Override
-    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-        project.performApply(configuration);
-        clazz.performApply(configuration);
-    }
+		packageFragmentRoot.createPackageFragmentEditor(comp,
+				"Source folder to be tested");
 
-    private void initializeDefaults(IJavaElement javaElement,
-            ILaunchConfigurationWorkingCopy config) {
-        initializeJavaProject(javaElement, config);
-        clazz.initializeClazz(javaElement, config);
-    }
+		packageFragment.createPackageFragmentEditor(comp,
+				"Package to be tested");
+
+		clazz.createClassEditor(comp, "Class to be tested");
+
+	}
+
+	@Override
+	public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+		IJavaElement je = getContext();
+		if (je != null) {
+			initializeDefaults(je, configuration);
+		}
+	}
+
+	@Override
+	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+		project.performApply(configuration);
+		packageFragmentRoot.performApply(configuration);
+		packageFragment.performApply(configuration);
+		clazz.performApply(configuration);
+	}
+
+	private void initializeDefaults(IJavaElement javaElement,
+			ILaunchConfigurationWorkingCopy config) {
+		initializeJavaProject(javaElement, config);
+		packageFragmentRoot.initializeFragment(javaElement, config);
+		packageFragment.initializeFragment(javaElement, config);
+		clazz.initializeClazz(javaElement, config);
+	}
 
 }

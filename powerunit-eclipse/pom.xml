@@ -315,6 +315,7 @@ This artifact is the eclipse integration</description>
 		<module>../powerunit-eclipse-feature</module>
 		<module>../powerunit-eclipse-p2updatesite</module>
 		<module>../powerunit-powerunit</module>
+		<module>../powerunit-extensions</module>
 	</modules>
 
 </project>

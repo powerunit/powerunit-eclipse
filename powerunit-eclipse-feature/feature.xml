@@ -1392,5 +1392,11 @@ Public License instead of this License.  But first, please read
          install-size="0"
          version="0.0.1.qualifier"
          unpack="false"/>
+   <plugin
+         id="ch.powerunit.powerunit-extensions"
+         download-size="0"
+         install-size="0"
+         version="0.0.1.qualifier"
+         unpack="false"/>
 
 </feature>

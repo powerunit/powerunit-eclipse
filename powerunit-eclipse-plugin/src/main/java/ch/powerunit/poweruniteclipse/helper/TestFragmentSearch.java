@@ -13,7 +13,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -30,11 +29,11 @@ import org.eclipse.swt.widgets.Display;
 
 import ch.powerunit.poweruniteclipse.Messages;
 
-public final class TestClassSearch {
-	private TestClassSearch() {
+public final class TestFragmentSearch {
+	private TestFragmentSearch() {
 	}
 
-	public static IType[] searchTestSuiteClazzFromProject(
+	public static IPackageFragment[] searchPackageFragmentFromProject(
 			IRunnableContext context, IJavaProject project)
 			throws InvocationTargetException, InterruptedException {
 		IJavaElement[] elements = null;
@@ -57,71 +56,19 @@ public final class TestClassSearch {
 		int constraints = IJavaSearchScope.SOURCES;
 		IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(
 				elements, constraints);
-		return TestClassSearch.searchTestSuiteClazz(context, searchScope);
+		return TestFragmentSearch.searchFragmentClazz(context, searchScope);
 	}
 
-	public static IType[] searchTestSuiteClazzFromPackageFragment(
-			IRunnableContext context, IPackageFragment packageFragment)
+	public static IPackageFragment[] searchFragmentClazz(
+			IRunnableContext context, final IJavaSearchScope scope)
 			throws InvocationTargetException, InterruptedException {
-		IJavaElement[] elements = null;
-		if ((packageFragment == null) || !packageFragment.exists()) {
-			IJavaModel model = JavaCore.create(ResourcesPlugin.getWorkspace()
-					.getRoot());
-			if (model != null) {
-				try {
-					elements = model.getJavaProjects();
-				} catch (JavaModelException e) {
-					// TODO
-				}
-			}
-		} else {
-			elements = new IJavaElement[] { packageFragment };
-		}
-		if (elements == null) {
-			elements = new IJavaElement[] {};
-		}
-		int constraints = IJavaSearchScope.SOURCES;
-		IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(
-				elements, constraints);
-		return TestClassSearch.searchTestSuiteClazz(context, searchScope);
-	}
-
-	public static IType[] searchTestSuiteClazzFromPackageFragmentRoot(
-			IRunnableContext context, IPackageFragmentRoot packageFragment)
-			throws InvocationTargetException, InterruptedException {
-		IJavaElement[] elements = null;
-		if ((packageFragment == null) || !packageFragment.exists()) {
-			IJavaModel model = JavaCore.create(ResourcesPlugin.getWorkspace()
-					.getRoot());
-			if (model != null) {
-				try {
-					elements = model.getJavaProjects();
-				} catch (JavaModelException e) {
-					// TODO
-				}
-			}
-		} else {
-			elements = new IJavaElement[] { packageFragment };
-		}
-		if (elements == null) {
-			elements = new IJavaElement[] {};
-		}
-		int constraints = IJavaSearchScope.SOURCES;
-		IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(
-				elements, constraints);
-		return TestClassSearch.searchTestSuiteClazz(context, searchScope);
-	}
-
-	public static IType[] searchTestSuiteClazz(IRunnableContext context,
-			final IJavaSearchScope scope) throws InvocationTargetException,
-			InterruptedException {
-		final IType[][] res = new IType[1][];
+		final IPackageFragment[][] res = new IPackageFragment[1][];
 
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor pm)
 					throws InvocationTargetException {
-				res[0] = searchTestSuiteClazz(pm, scope);
+				res[0] = searchFragment(pm, scope);
 			}
 		};
 		Display.getDefault().syncExec(new Runnable() {
@@ -145,17 +92,17 @@ public final class TestClassSearch {
 		return res[0];
 	}
 
-	public static IType[] searchTestSuiteClazz(IProgressMonitor pm,
+	public static IPackageFragment[] searchFragment(IProgressMonitor pm,
 			IJavaSearchScope scope) {
-		pm.beginTask(Messages.PowerUnitLaunchTabClass_2, 100);
+		pm.beginTask(Messages.PowerUnitLaunchTabFragment_2, 100);
 		int searchTicks = 100;
 
 		SearchPattern pattern = SearchPattern
 				.createPattern(
-						"TestSuite", IJavaSearchConstants.CLASS, IJavaSearchConstants.IMPLEMENTORS, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE); //$NON-NLS-1$
+						"*", IJavaSearchConstants.PACKAGE, IJavaSearchConstants.ALL_OCCURRENCES, SearchPattern.R_EXACT_MATCH | SearchPattern.R_CASE_SENSITIVE); //$NON-NLS-1$
 		SearchParticipant[] participants = new SearchParticipant[] { SearchEngine
 				.getDefaultSearchParticipant() };
-		ClassCollector collector = new ClassCollector();
+		PackageCollector collector = new PackageCollector();
 		IProgressMonitor searchMonitor = new SubProgressMonitor(pm, searchTicks);
 		try {
 			new SearchEngine().search(pattern, participants, scope, collector,
@@ -164,26 +111,27 @@ public final class TestClassSearch {
 			// TODO
 		}
 
-		List<IType> result = collector.getResult();
-		return result.toArray(new IType[result.size()]);
+		List<IPackageFragment> result = collector.getResult();
+		return result.toArray(new IPackageFragment[result.size()]);
 	}
 
-	private static class ClassCollector extends SearchRequestor {
-		private List<IType> fResult;
+	private static class PackageCollector extends SearchRequestor {
+		private List<IPackageFragment> fResult;
 
-		public ClassCollector() {
-			fResult = new ArrayList<IType>(200);
+		public PackageCollector() {
+			fResult = new ArrayList<IPackageFragment>(200);
 		}
 
-		public List<IType> getResult() {
+		public List<IPackageFragment> getResult() {
 			return fResult;
 		}
 
 		@Override
 		public void acceptSearchMatch(SearchMatch match) throws CoreException {
 			Object enclosingElement = match.getElement();
-			if (enclosingElement instanceof IType) { // defensive code
-				fResult.add((IType) enclosingElement);
+			if (enclosingElement instanceof IPackageFragment) { // defensive
+																// code
+				fResult.add((IPackageFragment) enclosingElement);
 			}
 		}
 	}

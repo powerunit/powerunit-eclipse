@@ -36,86 +36,104 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-    // The plug-in ID
-    public static final String PLUGIN_ID = "ch.powerunit.eclipse.plugin"; //$NON-NLS-1$
+	// The plug-in ID
+	public static final String PLUGIN_ID = "ch.powerunit.eclipse.plugin"; //$NON-NLS-1$
 
-    // The shared instance
-    private static Activator plugin;
+	// The shared instance
+	private static Activator plugin;
 
-    private Bundle powerunitBundle;
+	private Bundle powerunitBundle;
 
-    public static final ImageDescriptor POWERUNIT_ICON = ImageDescriptor
-            .createFromFile(Activator.class, "logo.gif"); //$NON-NLS-1$
+	private Bundle powerunitExtensionsBundle;
 
-    public static final Image POWERUNIT_IMAGE = POWERUNIT_ICON.createImage();
+	public static final ImageDescriptor POWERUNIT_ICON = ImageDescriptor
+			.createFromFile(Activator.class, "logo.gif"); //$NON-NLS-1$
 
-    public static final ImageDescriptor POWERUNIT_ICON_OK = ImageDescriptor
-            .createFromFile(Activator.class, "ok.png"); //$NON-NLS-1$
+	public static final Image POWERUNIT_IMAGE = POWERUNIT_ICON.createImage();
 
-    public static final Image POWERUNIT_IMAGE_OK = POWERUNIT_ICON_OK
-            .createImage();
+	public static final ImageDescriptor POWERUNIT_ICON_OK = ImageDescriptor
+			.createFromFile(Activator.class, "ok.png"); //$NON-NLS-1$
 
-    public static final ImageDescriptor POWERUNIT_ICON_KO = ImageDescriptor
-            .createFromFile(Activator.class, "ko.png"); //$NON-NLS-1$
+	public static final Image POWERUNIT_IMAGE_OK = POWERUNIT_ICON_OK
+			.createImage();
 
-    public static final Image POWERUNIT_IMAGE_KO = POWERUNIT_ICON_KO
-            .createImage();
+	public static final ImageDescriptor POWERUNIT_ICON_KO = ImageDescriptor
+			.createFromFile(Activator.class, "ko.png"); //$NON-NLS-1$
 
-    /**
-     * The constructor
-     */
-    public Activator() {
-    }
+	public static final Image POWERUNIT_IMAGE_KO = POWERUNIT_ICON_KO
+			.createImage();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-     * )
-     */
-    @Override
-    public void start(BundleContext context) throws Exception {
-        super.start(context);
-        plugin = this;
-        powerunitBundle = Arrays
-                .stream(context.getBundles())
-                .filter(p -> p.getSymbolicName().equals(
-                        "ch.powerunit.powerunit")).findFirst().orElse(null); //$NON-NLS-1$
-    }
+	/**
+	 * The constructor
+	 */
+	public Activator() {
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-     * )
-     */
-    @Override
-    public void stop(BundleContext context) throws Exception {
-        plugin = null;
-        super.stop(context);
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+	 * )
+	 */
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+		powerunitBundle = Arrays
+				.stream(context.getBundles())
+				.filter(p -> p.getSymbolicName().equals(
+						"ch.powerunit.powerunit")).findFirst().orElse(null); //$NON-NLS-1$
+		powerunitExtensionsBundle = Arrays
+				.stream(context.getBundles())
+				.filter(p -> p.getSymbolicName().equals(
+						"ch.powerunit.powerunit-extensions")).findFirst().orElse(null); //$NON-NLS-1$
+	}
 
-    /**
-     * Returns the shared instance
-     *
-     * @return the shared instance
-     */
-    public static Activator getDefault() {
-        return plugin;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+	 * )
+	 */
+	@Override
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
 
-    public IPath getPowerUnitPath() {
-        String basePath = null;
-        try {
-            basePath = FileLocator.getBundleFile(powerunitBundle)
-                    .getAbsolutePath();
-        } catch (IOException e1) {
-            // TODO
-        }
+	/**
+	 * Returns the shared instance
+	 *
+	 * @return the shared instance
+	 */
+	public static Activator getDefault() {
+		return plugin;
+	}
 
-        return new Path(basePath);
-    }
+	public IPath getPowerUnitPath() {
+		String basePath = null;
+		try {
+			basePath = FileLocator.getBundleFile(powerunitBundle)
+					.getAbsolutePath();
+		} catch (IOException e1) {
+			// TODO
+		}
+
+		return new Path(basePath);
+	}
+
+	public IPath getPowerUnitExtensionPath() {
+		String basePath = null;
+		try {
+			basePath = FileLocator.getBundleFile(powerunitExtensionsBundle)
+					.getAbsolutePath();
+		} catch (IOException e1) {
+			// TODO
+		}
+
+		return new Path(basePath);
+	}
 
 }

@@ -2,17 +2,17 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.powerunit</groupId>
-	<artifactId>ch.powerunit.powerunit</artifactId>
+	<artifactId>ch.powerunit.powerunit-extensions</artifactId>
 	<parent>
 		<groupId>ch.powerunit</groupId>
 		<artifactId>powerunit-eclipse</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../powerunit-eclipse/pom.xml</relativePath>
 	</parent>
-	<name>Powerunit - Java Testing framework for JDK 1.8 - Eclipse integration - PowerUnit exposition</name>
+	<name>Powerunit - Java Testing framework for JDK 1.8 - Eclipse integration - PowerUnit Extensions exposition</name>
 	<description>This is a test framework for the JDK 1.8.
 
-This artifact is the eclipse integration - PowerUnit exposition</description>
+This artifact is the eclipse integration - PowerUnit Extensions exposition</description>
 	<packaging>eclipse-plugin</packaging>
 
 	<scm>
@@ -23,20 +23,20 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 
 	<dependencies>
 		<dependency>
-			<groupId>ch.powerunit</groupId>
-			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.3.0</version>
+			<groupId>ch.powerunit.extensions</groupId>
+			<artifactId>powerunit-extensions-matchers</artifactId>
+			<version>0.0.2</version>
 		</dependency>
 		<dependency>
-			<groupId>ch.powerunit</groupId>
-			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.3.0</version>
+			<groupId>ch.powerunit.extensions</groupId>
+			<artifactId>powerunit-extensions-matchers</artifactId>
+			<version>0.0.2</version>
 			<classifier>sources</classifier>
 		</dependency>
 		<dependency>
-			<groupId>ch.powerunit</groupId>
-			<artifactId>powerunit-with-dependencies</artifactId>
-			<version>0.3.0</version>
+			<groupId>ch.powerunit.extensions</groupId>
+			<artifactId>powerunit-extensions-matchers</artifactId>
+			<version>0.0.2</version>
 			<classifier>javadoc</classifier>
 		</dependency>
 	</dependencies>
@@ -81,6 +81,7 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 							<outputDirectory>${project.build.directory}/classes</outputDirectory>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
+							<excludeTransitive>true</excludeTransitive>
 						</configuration>
 					</execution>
 					<execution>
@@ -93,6 +94,7 @@ This artifact is the eclipse integration - PowerUnit exposition</description>
 							<outputDirectory>${basedir}/src/main/java</outputDirectory>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
+							<excludeTransitive>true</excludeTransitive>
 						</configuration>
 					</execution>
 				</executions>

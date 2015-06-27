@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: PowerUnit
+Bundle-SymbolicName: ch.powerunit.powerunit-extensions;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Vendor: PowerUnit Extensions
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: ch.powerunit.extensions.matchers
+Bundle-ActivationPolicy: lazy

@@ -27,6 +27,7 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.debug.ui.launchConfigurations.JavaLaunchShortcut;
@@ -38,13 +39,15 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 
+import ch.powerunit.poweruniteclipse.internal.DummyTypeForPackageFragmentRoot;
 import ch.powerunit.poweruniteclipse.internal.DummyTypeForProject;
 
 /**
  * @author borettim
  *
  */
-public class PowerunitlaunchConfigurationShortcut extends JavaLaunchShortcut {
+public class PowerunitlaunchConfigurationPackageFragmentRootShortcut extends
+		JavaLaunchShortcut {
 
 	private ILaunchManager getLaunchManager() {
 		return DebugPlugin.getDefault().getLaunchManager();
@@ -61,44 +64,43 @@ public class PowerunitlaunchConfigurationShortcut extends JavaLaunchShortcut {
 		ILaunchConfiguration config = null;
 		ILaunchConfigurationWorkingCopy wc = null;
 		try {
-				ILaunchConfigurationType configType = getConfigurationType();
-				wc = configType.newInstance(
-						null,
-						getLaunchManager().generateLaunchConfigurationName(
-								type.getTypeQualifiedName('.')));
-				wc.setAttribute(
-						IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME,
-						type.getCompilationUnit().getJavaProject()
-								.getElementName());
-				wc.setAttribute(
-						IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-						type.getFullyQualifiedName());
-				wc.setAttribute(
-						PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_NAME,
-						type.getPackageFragment().getElementName());
-				wc.setAttribute(
-						PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_ROOT_NAME,
-						((IPackageFragmentRoot) type.getPackageFragment()
-								.getParent()).getResource()
-								.getProjectRelativePath().toString());
-				config = wc.doSave();
-			} catch (CoreException exception) {
-				MessageDialog.openError(JDIDebugUIPlugin
-						.getActiveWorkbenchShell(),
-						LauncherMessages.JavaLaunchShortcut_3, exception
-								.getStatus().getMessage());
-			}
+			ILaunchConfigurationType configType = getConfigurationType();
+			DummyTypeForPackageFragmentRoot root = ((DummyTypeForPackageFragmentRoot) type);
+			String rootName = root.getRoot().getResource()
+					.getProjectRelativePath().toString();
+			wc = configType.newInstance(
+					null,
+					getLaunchManager().generateLaunchConfigurationName(
+							root.getProject().getElementName() + " - "
+									+ rootName));
+			wc.setAttribute(
+					IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, root
+							.getProject().getElementName());
+			wc.setAttribute(
+					IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, "");
+			wc.setAttribute(
+					PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_NAME,
+					"");
+			wc.setAttribute(
+					PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_ROOT_NAME,
+					rootName);
+			config = wc.doSave();
+		} catch (CoreException exception) {
+			MessageDialog.openError(JDIDebugUIPlugin.getActiveWorkbenchShell(),
+					LauncherMessages.JavaLaunchShortcut_3, exception
+							.getStatus().getMessage());
+		}
 		return config;
 	}
 
 	@Override
 	protected IType[] findTypes(Object[] elements, IRunnableContext context)
 			throws InterruptedException, CoreException {
-		if (elements[0] instanceof CompilationUnit) {
-			CompilationUnit cu = (CompilationUnit) elements[0];
-			IType type = Arrays.stream(cu.getAllTypes()).findFirst()
-					.orElse(null);
-			return new IType[] { type };
+		if (elements[0] instanceof IPackageFragmentRoot) {
+			IPackageFragmentRoot root = (IPackageFragmentRoot) elements[0];
+			IJavaProject jp = root.getJavaProject();
+			IType runner = new DummyTypeForPackageFragmentRoot(jp, root);
+			return new IType[] { runner };
 		}
 		return new IType[] { null };
 	}

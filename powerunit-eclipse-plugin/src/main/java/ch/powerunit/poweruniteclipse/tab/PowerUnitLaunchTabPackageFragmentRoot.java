@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -46,103 +47,48 @@ import org.eclipse.swt.widgets.Text;
 
 import ch.powerunit.poweruniteclipse.Messages;
 import ch.powerunit.poweruniteclipse.PowerUnitLaunchTab;
+import ch.powerunit.poweruniteclipse.PowerunitLaunchConfigurationDelegate;
+import ch.powerunit.poweruniteclipse.helper.FragmentSelectionDialog;
 import ch.powerunit.poweruniteclipse.helper.SWTHelper;
 import ch.powerunit.poweruniteclipse.helper.TestClassSearch;
+import ch.powerunit.poweruniteclipse.helper.TestFragmentSearch;
 import ch.powerunit.poweruniteclipse.helper.TypeSelectionDialog;
 
 /**
  * @author borettim
  *
  */
-public final class PowerUnitLaunchTabClass {
+public final class PowerUnitLaunchTabPackageFragmentRoot {
 
-
-	public PowerUnitLaunchTabClass(PowerUnitLaunchTab parent,
-			PowerUnitLaunchTabPackageFragmentRoot packageFragmentRoot,
-			PowerUnitLaunchTabPackageFragment packageFragment,
+	public PowerUnitLaunchTabPackageFragmentRoot(PowerUnitLaunchTab parent,
 			PowerUnitLaunchTabProject project) {
 		this.parent = parent;
-		this.packageFragment = packageFragment;
-		this.packageFragmentRoot = packageFragmentRoot;
 		this.project = project;
 	}
 
 	private final PowerUnitLaunchTab parent;
 
 	private final PowerUnitLaunchTabProject project;
-	
-	private final PowerUnitLaunchTabPackageFragmentRoot packageFragmentRoot;
-	
-	private final PowerUnitLaunchTabPackageFragment packageFragment;
 
 	private static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
-	private Text fClazzText;
+	private Text fFragmentRootText;
 
-	private Button fSearchButton;
-
-	public void createClassEditor(Composite parent, String text) {
+	public void createPackageFragmentEditor(Composite parent, String text) {
 		Group group = SWTHelper.createGroup(parent, text, 2, 1,
 				GridData.FILL_HORIZONTAL);
-		fClazzText = SWTHelper.createSingleText(group, 1);
-		fClazzText.addModifyListener(new ModifyListener() {
+		fFragmentRootText = SWTHelper.createSingleText(group, 1);
+		fFragmentRootText.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				PowerUnitLaunchTabClass.this.parent
+				PowerUnitLaunchTabPackageFragmentRoot.this.parent
 						.updateLaunchConfigurationDialog();
 			}
 		});
-		fSearchButton = SWTHelper.createPushButton(group,
-				Messages.PowerUnitLaunchTabClass_0, null);
-		fSearchButton.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
 
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				handleSearchButtonSelected();
-			}
-		});
 	}
 
-	/**
-	 * The select button pressed handler
-	 */
-	private void handleSearchButtonSelected() {
-		IJavaProject project = this.project.getJavaProject();
-		IType[] types = null;
-
-		try {
-
-			types = TestClassSearch.searchTestSuiteClazzFromProject(
-					this.parent.getLaunchConfigurationDialog(), project);
-		} catch (InvocationTargetException e) {
-			// TODO
-			return;
-		} catch (InterruptedException e) {
-			// TODO
-			return;
-		}
-
-		TypeSelectionDialog mmsd = new TypeSelectionDialog(
-				this.parent.getShell(), types,
-				Messages.PowerUnitLaunchTabClass_1);
-		if (mmsd.open() == Window.CANCEL) {
-			return;
-		}
-		Object[] results = mmsd.getResult();
-		IType type = (IType) results[0];
-		if (type != null) {
-			fClazzText.setText(type.getFullyQualifiedName());
-			this.project.setProject(type.getJavaProject());
-			this.packageFragment.setFragment(type.getPackageFragment());
-			this.packageFragmentRoot
-					.setFragmentRoot((IPackageFragmentRoot)type.getPackageFragment().getParent());
-		}
-	}
-
-	public void initializeClazz(IJavaElement javaElement,
+	public void initializeFragment(IJavaElement javaElement,
 			ILaunchConfigurationWorkingCopy config) {
 		String name = null;
 		if (javaElement instanceof IMember) {
@@ -156,44 +102,57 @@ public final class PowerUnitLaunchTabClass {
 		if (javaElement instanceof ICompilationUnit) {
 			try {
 				name = ((ICompilationUnit) javaElement).getTypes()[0]
-						.getFullyQualifiedName();
+						.getPackageFragment().getParent().getElementName();
 			} catch (JavaModelException e) {
 				// TODO
 			}
 		} else if (javaElement instanceof IClassFile) {
-			name = ((IClassFile) javaElement).getType().getFullyQualifiedName();
+			name = ((IPackageFragmentRoot) ((IClassFile) javaElement).getType()
+					.getPackageFragment().getParent()).getResource()
+					.getProjectRelativePath().toString();
+		} else if (javaElement instanceof IPackageFragment) {
+			name = ((IPackageFragmentRoot) ((IPackageFragment) javaElement)
+					.getParent()).getResource().getProjectRelativePath()
+					.toString();
+		} else if (javaElement instanceof IPackageFragmentRoot) {
+			name = ((IPackageFragmentRoot) javaElement).getResource()
+					.getProjectRelativePath().toString();
 		}
 		if (name == null) {
 			name = EMPTY_STRING;
 		}
 		config.setAttribute(
-				IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME, name);
+				PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_ROOT_NAME,
+				name);
 		if (name.length() > 0) {
-			int index = name.lastIndexOf('.');
-			if (index > 0) {
-				name = name.substring(index + 1);
-			}
 			name = parent.getLaunchConfigurationDialog().generateName(name);
 			config.rename(name);
 		}
 	}
 
-	public void updateClazzFromConfig(ILaunchConfiguration config) {
-		String clazzName = EMPTY_STRING;
+	public void updateFragmentFromConfig(ILaunchConfiguration config) {
+		String fragment = EMPTY_STRING;
 		try {
-			clazzName = config.getAttribute(
-					IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-					EMPTY_STRING);
+			fragment = config
+					.getAttribute(
+							PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_ROOT_NAME,
+							EMPTY_STRING);
 		} catch (CoreException ce) {
 			// TODO
 		}
-		fClazzText.setText(clazzName);
+		fFragmentRootText.setText(fragment);
 	}
 
 	public void performApply(ILaunchConfigurationWorkingCopy configuration) {
-		configuration.setAttribute(
-				IJavaLaunchConfigurationConstants.ATTR_MAIN_TYPE_NAME,
-				fClazzText.getText().trim());
+		configuration
+				.setAttribute(
+						PowerunitLaunchConfigurationDelegate.PACKAGE_FRAGMENT_ROOT_NAME,
+						fFragmentRootText.getText().trim());
+	}
+
+	public void setFragmentRoot(IPackageFragmentRoot fragment) {
+		fFragmentRootText.setText(fragment.getResource()
+				.getProjectRelativePath().toString());
 	}
 
 }
