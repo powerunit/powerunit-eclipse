@@ -19,7 +19,9 @@
  */
 package ch.powerunit.poweruniteclipse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -30,7 +32,11 @@ import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
 import org.eclipse.jdt.internal.debug.ui.actions.OpenTypeAction;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -59,9 +65,11 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tracker;
 import org.eclipse.ui.IEditorInput;
@@ -123,7 +131,7 @@ public class PowerUnitResultView extends ViewPart {
 		resultViewer = new TreeViewer(comp, SWT.BORDER | SWT.SINGLE);
 		resultViewer.setContentProvider(new TreeResulContentProvider());
 		resultViewer.setLabelProvider(new TreeResultLabelProvider());
-		resultViewer.setInput(results);
+		resultViewer.setInput(null);
 		resultViewer.expandAll();
 
 		GridData gridData = new GridData();
@@ -328,9 +336,9 @@ public class PowerUnitResultView extends ViewPart {
 							.getDocumentProvider();
 					provider.connect(editorInput);
 					IDocument document = provider.getDocument(editorInput);
-						IRegion line = document.getLineInformation(lineNumber-1);
-						textEditor.selectAndReveal(line.getOffset(),
-								line.getLength());
+					IRegion line = document.getLineInformation(lineNumber - 1);
+					textEditor.selectAndReveal(line.getOffset(),
+							line.getLength());
 					provider.disconnect(editorInput);
 				}
 			}
@@ -339,14 +347,83 @@ public class PowerUnitResultView extends ViewPart {
 
 	private void createToolbar() {
 		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+		Action choose = new Action(Messages.PowerUnitResultActionChooseResult_0) {
+		};
+		choose.setImageDescriptor(Activator.POWERUNIT_ICON);
+		choose.setMenuCreator(new IMenuCreator() {
 
+			private MenuManager menu = null;
+
+			@Override
+			public void dispose() {
+				if (menu != null) {
+					menu.dispose();
+				}
+				menu = null;
+			}
+
+			private void fillManager(MenuManager mn) {
+				menu = mn;
+				results.stream().forEachOrdered(
+						r -> mn.add(new Action(r.getName()) {
+
+							{
+								if (r.getFailures() > 0
+										|| r.getErrors() > 0) {
+									setImageDescriptor(Activator.POWERUNIT_ICON_KO);
+								} else {
+									setImageDescriptor(Activator.POWERUNIT_ICON_OK);
+								}
+
+							}
+
+							/*
+							 * (non-Javadoc)
+							 * 
+							 * @see org.eclipse.jface.action.Action#run()
+							 */
+							@Override
+							public void run() {
+								setCurrent(r);
+							}
+						}));
+			}
+
+			@Override
+			public Menu getMenu(Control parent) {
+				dispose();
+				MenuManager mn = new MenuManager();
+				fillManager(mn);
+				return mn.createContextMenu(parent);
+			}
+
+			@Override
+			public Menu getMenu(Menu parent) {
+				dispose();
+				MenuManager mn = new MenuManager();
+				fillManager(mn);
+				Menu menu = new Menu(parent);
+				mn.fill(menu, 0);
+				return menu;
+			}
+		});
+		mgr.add(choose);
 	}
 
-	private Map<String, Testsuites> results = new TreeMap<>((String c1,
-			String c2) -> c1.compareTo(c2));
+	private List<Testsuites> results = new ArrayList<>();
+
+	private int maxResults = 10;
 
 	public void addResult(Testsuites suites) {
-		results.put(suites.getName(), suites);
+		results.add(suites);
+		while (results.size() > maxResults) {
+			results.remove(0);
+		}
+		setCurrent(suites);
+	}
+
+	private void setCurrent(Testsuites suites) {
+		resultViewer.setInput(suites);
 		resultViewer.refresh();
 	}
 
@@ -432,8 +509,11 @@ public class PowerUnitResultView extends ViewPart {
 
 		@Override
 		public Object[] getElements(Object inputElement) {
-			return ((Map<String, Testsuites>) inputElement).values().toArray(
-					new Testsuites[0]);
+			if (inputElement == null) {
+				return new Testsuites[0];
+			}
+			return ((Testsuites) inputElement).getTestsuite().toArray(
+					new Testsuite[0]);
 		}
 
 		@Override
