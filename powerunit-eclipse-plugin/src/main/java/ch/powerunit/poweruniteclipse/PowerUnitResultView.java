@@ -19,8 +19,11 @@
  */
 package ch.powerunit.poweruniteclipse;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.IDebugModelPresentation;
@@ -28,6 +31,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
 import org.eclipse.jdt.internal.debug.ui.actions.OpenTypeAction;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -40,15 +46,30 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.LineStyleEvent;
+import org.eclipse.swt.custom.LineStyleListener;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tracker;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import ch.powerunit.report.Testcase;
 import ch.powerunit.report.Testsuite;
@@ -64,7 +85,9 @@ public class PowerUnitResultView extends ViewPart {
 
 	private TreeViewer resultViewer;
 
-	private Text stackTrace;
+	private StyledText stackTrace;
+
+	private StyleRange ranges[];
 
 	/*
 	 * (non-Javadoc)
@@ -91,7 +114,7 @@ public class PowerUnitResultView extends ViewPart {
 	}
 
 	private void createDisplay(Composite parent) {
-		Composite comp = new Composite(parent, SWT.NONE);
+		Composite comp = new Composite(parent, SWT.NONE | SWT.FILL);
 
 		GridLayout topLayout = new GridLayout();
 		topLayout.numColumns = 2;
@@ -110,16 +133,38 @@ public class PowerUnitResultView extends ViewPart {
 		gridData.horizontalSpan = 1;
 		resultViewer.getTree().setLayoutData(gridData);
 
-		stackTrace = new Text(comp, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL
+		stackTrace = new StyledText(comp, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL
 				| SWT.H_SCROLL);
 		stackTrace.setEditable(false);
-		gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.verticalAlignment = GridData.FILL;
-		gridData.grabExcessVerticalSpace = true;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.horizontalSpan = 1;
-		stackTrace.setLayoutData(gridData);
+		GridData gridData2 = new GridData();
+		gridData2.horizontalAlignment = GridData.FILL;
+		gridData2.verticalAlignment = GridData.FILL;
+		gridData2.grabExcessVerticalSpace = true;
+		gridData2.grabExcessHorizontalSpace = true;
+		gridData2.horizontalSpan = 1;
+		stackTrace.setLayoutData(gridData2);
+
+		resultViewer.getTree().addListener(SWT.MouseDown, new Listener() {
+
+			public void handleEvent(Event e) {
+
+				Tracker tracker = new Tracker(resultViewer.getTree()
+						.getParent(), SWT.RESIZE | SWT.RIGHT
+						| SWT.LEFT_TO_RIGHT);
+				tracker.setStippled(true);
+				Rectangle rect = resultViewer.getTree().getBounds();
+				tracker.setRectangles(new Rectangle[] { rect });
+				if (tracker.open()) {
+					Rectangle after = tracker.getRectangles()[0];
+					if (!after.equals(rect)) {
+						resultViewer.getTree().setBounds(after);
+						gridData.widthHint = after.width;
+						comp.layout(true);
+					}
+				}
+				tracker.dispose();
+			}
+		});
 
 		resultViewer
 				.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -127,6 +172,7 @@ public class PowerUnitResultView extends ViewPart {
 					public void selectionChanged(SelectionChangedEvent event) {
 
 						if (event.getSelection().isEmpty()) {
+							ranges = new StyleRange[] {};
 							stackTrace.setText("");
 						} else if (event.getSelection() instanceof IStructuredSelection) {
 							IStructuredSelection selection = (IStructuredSelection) event
@@ -141,9 +187,11 @@ public class PowerUnitResultView extends ViewPart {
 									stackTrace.setText(tc.getFailure().get(0)
 											.getContent());
 								} else {
+									ranges = new StyleRange[] {};
 									stackTrace.setText("");
 								}
 							} else {
+								ranges = new StyleRange[] {};
 								stackTrace.setText("");
 							}
 						}
@@ -164,25 +212,108 @@ public class PowerUnitResultView extends ViewPart {
 						try {
 							IType result = OpenTypeAction.findTypeInWorkspace(
 									((Testcase) s).getClassname(), false);
-							processSearchResult(result);
-						} catch (CoreException e) {
+							processSearchResult(result, -1);
+						} catch (CoreException | BadLocationException e) {
 							e.printStackTrace();
 						}
 					}
 					if (s instanceof Testsuites) {
 
 					}
-					if (s instanceof Testsuite) {
-
+					if (s instanceof Testsuite
+							&& !((Testsuite) s).getTestcase().isEmpty()) {
+						try {
+							IType result = OpenTypeAction.findTypeInWorkspace(
+									((Testsuite) s).getTestcase().iterator()
+											.next().getClassname(), false);
+							processSearchResult(result, -1);
+						} catch (CoreException | BadLocationException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 
 			}
 		});
 
+		stackTrace.addLineStyleListener(new LineStyleListener() {
+
+			private final Pattern LOG_LINK_PATTERN = Pattern
+					.compile("^\\s*[^(]+\\(([^:]+:[0-9]+)\\)\\s*$");
+
+			@Override
+			public void lineGetStyle(LineStyleEvent listener) {
+				Matcher m = LOG_LINK_PATTERN.matcher(listener.lineText);
+				if (m.matches()) {
+					StyleRange sr = new StyleRange();
+					sr.start = listener.lineOffset + m.start(1);
+					sr.length = m.end(1) - m.start(1);
+					sr.underline = true;
+					Device device = Display.getCurrent();
+					sr.underlineColor = device.getSystemColor(SWT.COLOR_BLUE);
+					sr.foreground = device.getSystemColor(SWT.COLOR_BLUE);
+					if (listener.styles == null) {
+						listener.styles = new StyleRange[] { sr };
+					} else {
+						StyleRange nr[] = new StyleRange[listener.styles.length + 1];
+						System.arraycopy(listener.styles, 0, nr, 1,
+								listener.styles.length);
+						nr[0] = sr;
+						listener.styles = nr;
+					}
+					StyleRange nr[] = new StyleRange[ranges.length + 1];
+					System.arraycopy(ranges, 0, nr, 1, ranges.length);
+					nr[0] = sr;
+					ranges = nr;
+				}
+			}
+		});
+
+		stackTrace.addListener(SWT.MouseDown, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				try {
+					Point point = new Point(event.x, event.y);
+					int offset = stackTrace.getOffsetAtLocation(point);
+					StyleRange style = getStyleAt(offset);
+					if (style != null && style.underline) {
+						String shortName = stackTrace.getText(style.start,
+								style.start + style.length - 1);
+						String line = stackTrace.getLine(stackTrace
+								.getLineAtOffset(offset));
+						String shortClassName = shortName.replaceAll(
+								"(.java)?:[0-9]+\\s*", "");
+						String className = line.replaceAll("\\s+", "");
+						className = className.substring(0,
+								className.indexOf(shortClassName))
+								+ shortClassName;
+						try {
+							IType result = OpenTypeAction.findTypeInWorkspace(
+									className, false);
+							processSearchResult(result, Integer
+									.valueOf(shortName
+											.replaceAll("^[^:]*:", "")));
+						} catch (CoreException | BadLocationException e) {
+							e.printStackTrace();
+						}
+					}
+				} catch (IllegalArgumentException e) {
+				}
+			}
+
+		});
+
 	}
 
-	protected void processSearchResult(IType target) throws PartInitException {
+	private StyleRange getStyleAt(int offset) {
+		return Arrays
+				.stream(ranges)
+				.filter(s -> (s.start <= offset && s.start + s.length >= offset))
+				.findFirst().orElse(null);
+	}
+
+	protected void processSearchResult(IType target, int lineNumber)
+			throws CoreException, BadLocationException {
 		IDebugModelPresentation presentation = JDIDebugUIPlugin.getDefault()
 				.getModelPresentation();
 		IEditorInput editorInput = presentation.getEditorInput(target);
@@ -191,6 +322,17 @@ public class PowerUnitResultView extends ViewPart {
 			if (editorId != null) {
 				IEditorPart editorPart = JDIDebugUIPlugin.getActivePage()
 						.openEditor(editorInput, editorId);
+				if (editorPart instanceof ITextEditor && lineNumber >= 0) {
+					ITextEditor textEditor = (ITextEditor) editorPart;
+					IDocumentProvider provider = textEditor
+							.getDocumentProvider();
+					provider.connect(editorInput);
+					IDocument document = provider.getDocument(editorInput);
+						IRegion line = document.getLineInformation(lineNumber-1);
+						textEditor.selectAndReveal(line.getOffset(),
+								line.getLength());
+					provider.disconnect(editorInput);
+				}
 			}
 		}
 	}
