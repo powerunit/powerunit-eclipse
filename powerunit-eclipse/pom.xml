@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.powerunit</groupId>
 	<artifactId>powerunit-eclipse</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>Powerunit - Java Testing framework for JDK 1.8 - Eclipse integration</name>
 	<description>This is a test framework for the JDK 1.8.
 
