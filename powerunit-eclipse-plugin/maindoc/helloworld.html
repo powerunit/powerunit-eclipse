@@ -1,0 +1,49 @@
+<html>
+	<head>
+		<title>The helloworld</title>
+	</head>
+	<body>
+		Let's assume we have the following class to be tested :
+		<pre>
+package ch.powerunit.demo;
+
+public class MyBean {
+  private String field1;
+
+  public String getField1() {
+    return field1;
+  }
+
+  public void setField1(String field1) {
+    this.field1 = field1;
+  }
+}
+		</pre>
+		It is possible to implements a test in the following way:
+		<pre>
+package ch.powerunit.demo;
+
+import ch.powerunit.Rule;
+import ch.powerunit.Test;
+import ch.powerunit.TestRule;
+import ch.powerunit.TestSuite;
+
+public class MyBeanTest implements TestSuite {
+  @Rule
+  public final TestRule rule = before(this::prepare);
+
+  private MyBean bean;
+
+  private void prepare() {
+    bean = new MyBean();
+  }
+
+  @Test
+  public void testSimple() {
+    bean.setField1("x");
+    assertThat(bean.getField1()).is("x");
+  }
+}
+		</pre>
+	</body>
+</html>

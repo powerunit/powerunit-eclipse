@@ -275,4 +275,16 @@
          class="ch.powerunit.poweruniteclipse.PowerUnitResultView">
   	</view>
   </extension>
+  
+  <extension point="org.eclipse.ui.perspectiveExtensions">
+  	<perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+  		<view id="ch.powerunit.PowerUnitResultView"
+                    relationship="fast"/>
+    </perspectiveExtension>
+  </extension>
+  
+  <extension point="org.eclipse.help.toc">
+  <toc file="maindoc.xml" primary="true"/>
+  <index path="maindoc/index"/>
+ </extension>
 </plugin>

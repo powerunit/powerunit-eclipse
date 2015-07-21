@@ -46,6 +46,8 @@ public class Activator extends AbstractUIPlugin {
 
 	private Bundle powerunitExtensionsBundle;
 
+	private Bundle self;
+
 	public static final ImageDescriptor POWERUNIT_ICON = ImageDescriptor
 			.createFromFile(Activator.class, "logo.gif"); //$NON-NLS-1$
 
@@ -88,6 +90,7 @@ public class Activator extends AbstractUIPlugin {
 				.stream(context.getBundles())
 				.filter(p -> p.getSymbolicName().equals(
 						"ch.powerunit.powerunit-extensions")).findFirst().orElse(null); //$NON-NLS-1$
+		self = context.getBundle();
 	}
 
 	/*
@@ -129,6 +132,17 @@ public class Activator extends AbstractUIPlugin {
 		try {
 			basePath = FileLocator.getBundleFile(powerunitExtensionsBundle)
 					.getAbsolutePath();
+		} catch (IOException e1) {
+			// TODO
+		}
+
+		return new Path(basePath);
+	}
+
+	public IPath getSelfPath() {
+		String basePath = null;
+		try {
+			basePath = FileLocator.getBundleFile(self).getAbsolutePath();
 		} catch (IOException e1) {
 			// TODO
 		}
