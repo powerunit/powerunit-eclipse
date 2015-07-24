@@ -276,6 +276,22 @@
   	</view>
   </extension>
   
+  <extension point="org.eclipse.ui.newWizards">
+   <category
+       id="ch.powerunit.PowerUnitCategory" 
+       name="%resultView.category">
+	</category>
+   <wizard
+       id="ch.powerunit.poweruniteclipse.wizard.NewPowerUnitTestWizard"
+       name="PowerUnit Test"
+       class="ch.powerunit.poweruniteclipse.wizard.NewPowerUnitTestWizard"
+       icon="./icons/logo.gif"
+       category="ch.powerunit.PowerUnitCategory">
+     <description>Create a Powerunit test case</description>
+     <selection class="org.eclipse.core.resources.IResource" /> 
+   </wizard>
+ </extension>
+  
   <extension point="org.eclipse.ui.perspectiveExtensions">
   	<perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
   		<view id="ch.powerunit.PowerUnitResultView"
