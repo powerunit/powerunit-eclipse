@@ -24,8 +24,12 @@ import java.util.Collections;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.wizards.NewTypeWizardPage;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -53,9 +57,11 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 	private Button fCreateAfter;
 
 	private Button fParameterized;
-	
+
 	private IJavaElement jelem;
-	
+
+	private IType underTest;
+
 	public IJavaElement getInputJavaElement() {
 		return jelem;
 	}
@@ -69,7 +75,31 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		initContainerPage(jelem);
 		initTypePage(jelem);
 		setAddComments(true, true);
-		// setTypeName(((IType)jelem). + "Test", true);
+		if (jelem instanceof ICompilationUnit) {
+			ICompilationUnit unit = (ICompilationUnit) jelem;
+			try {
+				if (unit.getAllTypes().length > 0) {
+					IType t = unit.getAllTypes()[0];
+					setTypeName(t.getElementName() + "Test", true);
+					for (IPackageFragmentRoot r : jelem.getJavaProject()
+							.getPackageFragmentRoots()) {
+						if (r.getKind() == IPackageFragmentRoot.K_SOURCE
+								&& r.getPath()
+										.makeRelativeTo(
+												jelem.getJavaProject()
+														.getPath())
+										.toPortableString()
+										.startsWith("src/test/java")) {
+							setPackageFragmentRoot(r, true);
+							break;
+						}
+					}
+					underTest = t;
+				}
+			} catch (JavaModelException e) {
+				// ignore
+			}
+		}
 		doStatusUpdate();
 		setSuperInterfaces(Collections.singletonList("ch.powerunit.TestSuite"),
 				false);
@@ -131,19 +161,51 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 	protected void createTypeMembers(IType newType, ImportsManager imports,
 			IProgressMonitor monitor) throws CoreException {
 
-		if (fParameterized.getSelection()) {
-			imports.addImport("java.util.Arrays");
-			imports.addImport("java.util.stream.Stream");
+		imports.addImport("ch.powerunit.Test");
 
-			imports.addImport("ch.powerunit.Parameters");
-			imports.addImport("ch.powerunit.Parameter");
+		IJavaElement prev = null;
 
-			newType.createMethod(
-					"@Parameters public static Stream<Object[]> getDatas() {return Arrays.stream(new Object[][] { { \"x\"} });}",
-					null, false, monitor);
+		if (underTest == null) {
 
-			newType.createField("@Parameter(0) public String param1;", null,
-					false, monitor);
+			if (fParameterized.getSelection()) {
+				prev = newType
+						.createMethod(
+								"@Test public void test() {fail(\"Implement me \"+param1);}",
+								prev, false, monitor);
+			} else {
+				prev = newType.createMethod(
+						"@Test public void test() {fail(\"Implement me\");}",
+						prev, false, monitor);
+			}
+
+		} else {
+			for (IMethod m : underTest.getMethods()) {
+				// TODO
+			}
+		}
+
+		if (fCreateAfter.getSelection()) {
+			prev = newType.createMethod("public void after() {}", prev, false,
+					monitor);
+		}
+
+		if (fCreateBefore.getSelection()) {
+			if (underTest != null
+					&& underTest.getMethod("<init>", new String[] {}) != null) {
+				prev = newType.createMethod(
+						"public void before() {underTest = new "
+								+ underTest.getElementName() + "();}", prev,
+						false, monitor);
+			} else {
+				prev = newType.createMethod("public void before() {}", prev,
+						false, monitor);
+			}
+		}
+
+		if (underTest != null) {
+			imports.addImport(underTest.getFullyQualifiedName());
+			prev = newType.createField("private " + underTest.getElementName()
+					+ " underTest;\n", prev, false, monitor);
 		}
 
 		if (fCreateBefore.getSelection() || fCreateAfter.getSelection()) {
@@ -152,22 +214,31 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 			String field = "";
 			if (fCreateBefore.getSelection() && fCreateAfter.getSelection()) {
-				field = "@Rule public final TestRule chain = before(this::before).around(after(this::after));";
+				field = "@Rule public final TestRule chain = before(this::before).around(after(this::after));\n";
 			} else if (fCreateBefore.getSelection()) {
-				field = "@Rule public final TestRule chain = before(this::before);";
+				field = "@Rule public final TestRule chain = before(this::before);\n";
 			} else {
-				field = "@Rule public final TestRule chain = after(this::after);";
+				field = "@Rule public final TestRule chain = after(this::after);\n";
 			}
-			newType.createField(field, null, false, monitor);
+			prev = newType.createField(field, prev, false, monitor);
 		}
 
-		if (fCreateBefore.getSelection()) {
-			newType.createMethod("public void before() {}", null, false,
-					monitor);
+		if (fParameterized.getSelection()) {
+			imports.addImport("java.util.Arrays");
+			imports.addImport("java.util.stream.Stream");
+
+			imports.addImport("ch.powerunit.Parameters");
+			imports.addImport("ch.powerunit.Parameter");
+
+			prev = newType.createField("@Parameter(0) public String param1;\n",
+					prev, false, monitor);
+
+			prev = newType
+					.createMethod(
+							"@Parameters public static Stream<Object[]> getDatas() {return Arrays.stream(new Object[][] { { \"x\"} });}",
+							prev, false, monitor);
+
 		}
 
-		if (fCreateAfter.getSelection()) {
-			newType.createMethod("public void after() {}", null, false, monitor);
-		}
 	}
 }
