@@ -2,4 +2,8 @@
  <topic label="Helloworld Example" href="maindoc/helloworld.html">
  	
  </topic>
+ <topic href="maindoc/create.html" label="Create the Powerunit class">
+ </topic>
+  <topic href="maindoc/result.html" label="The powerunit result view">
+ </topic>
 </toc>

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.ui.IDebugModelPresentation;
+import org.eclipse.help.IContextProvider;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
 import org.eclipse.jdt.internal.debug.ui.actions.OpenTypeAction;
@@ -75,10 +76,13 @@ import org.eclipse.swt.widgets.Tracker;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
+import ch.powerunit.poweruniteclipse.helper.OpenTypeHelper;
 import ch.powerunit.report.Testcase;
 import ch.powerunit.report.Testsuite;
 import ch.powerunit.report.Testsuites;
@@ -117,12 +121,15 @@ public class PowerUnitResultView extends ViewPart {
 	 */
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
 	}
 
 	private void createDisplay(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE | SWT.FILL);
+		PlatformUI
+				.getWorkbench()
+				.getHelpSystem()
+				.setHelp(comp,
+						"ch.powerunit.eclipse.plugin.PowerUnitResultContextualHelp");
 
 		GridLayout topLayout = new GridLayout();
 		topLayout.numColumns = 2;
@@ -220,7 +227,7 @@ public class PowerUnitResultView extends ViewPart {
 						try {
 							IType result = OpenTypeAction.findTypeInWorkspace(
 									((Testcase) s).getClassname(), false);
-							processSearchResult(result, -1);
+							OpenTypeHelper.processSearchResult(result, -1);
 						} catch (CoreException | BadLocationException e) {
 							e.printStackTrace();
 						}
@@ -234,7 +241,7 @@ public class PowerUnitResultView extends ViewPart {
 							IType result = OpenTypeAction.findTypeInWorkspace(
 									((Testsuite) s).getTestcase().iterator()
 											.next().getClassname(), false);
-							processSearchResult(result, -1);
+							OpenTypeHelper.processSearchResult(result, -1);
 						} catch (CoreException | BadLocationException e) {
 							e.printStackTrace();
 						}
@@ -298,7 +305,7 @@ public class PowerUnitResultView extends ViewPart {
 						try {
 							IType result = OpenTypeAction.findTypeInWorkspace(
 									className, false);
-							processSearchResult(result, Integer
+							OpenTypeHelper.processSearchResult(result, Integer
 									.valueOf(shortName
 											.replaceAll("^[^:]*:", "")));
 						} catch (CoreException | BadLocationException e) {
@@ -318,31 +325,6 @@ public class PowerUnitResultView extends ViewPart {
 				.stream(ranges)
 				.filter(s -> (s.start <= offset && s.start + s.length >= offset))
 				.findFirst().orElse(null);
-	}
-
-	protected void processSearchResult(IType target, int lineNumber)
-			throws CoreException, BadLocationException {
-		IDebugModelPresentation presentation = JDIDebugUIPlugin.getDefault()
-				.getModelPresentation();
-		IEditorInput editorInput = presentation.getEditorInput(target);
-		if (editorInput != null) {
-			String editorId = presentation.getEditorId(editorInput, target);
-			if (editorId != null) {
-				IEditorPart editorPart = JDIDebugUIPlugin.getActivePage()
-						.openEditor(editorInput, editorId);
-				if (editorPart instanceof ITextEditor && lineNumber >= 0) {
-					ITextEditor textEditor = (ITextEditor) editorPart;
-					IDocumentProvider provider = textEditor
-							.getDocumentProvider();
-					provider.connect(editorInput);
-					IDocument document = provider.getDocument(editorInput);
-					IRegion line = document.getLineInformation(lineNumber - 1);
-					textEditor.selectAndReveal(line.getOffset(),
-							line.getLength());
-					provider.disconnect(editorInput);
-				}
-			}
-		}
 	}
 
 	private void createToolbar() {
@@ -368,8 +350,7 @@ public class PowerUnitResultView extends ViewPart {
 						r -> mn.add(new Action(r.getName()) {
 
 							{
-								if (r.getFailures() > 0
-										|| r.getErrors() > 0) {
+								if (r.getFailures() > 0 || r.getErrors() > 0) {
 									setImageDescriptor(Activator.POWERUNIT_ICON_KO);
 								} else {
 									setImageDescriptor(Activator.POWERUNIT_ICON_OK);
@@ -545,6 +526,17 @@ public class PowerUnitResultView extends ViewPart {
 			return false;
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
+	 */
+	@Override
+	public Object getAdapter(Class adapter) {
+		if (adapter.equals(IContextProvider.class)) {
+			return new HelpContextualProvider();
+		}
+		return super.getAdapter(adapter);
 	}
 
 }

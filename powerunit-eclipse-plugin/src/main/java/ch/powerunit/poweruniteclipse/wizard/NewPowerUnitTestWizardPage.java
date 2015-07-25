@@ -20,10 +20,13 @@
 package ch.powerunit.poweruniteclipse.wizard;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -37,8 +40,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.PlatformUI;
 
 import ch.powerunit.poweruniteclipse.Activator;
+import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
 
 /**
  * @author borettim
@@ -48,7 +54,8 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 	public NewPowerUnitTestWizardPage() {
 		super(NewTypeWizardPage.CLASS_TYPE, "Powerunit test case");
-		setTitle("Create the test case");
+		setTitle("Create the Powerunit class");
+		setDescription("Specify the required information for the new Powerunit test class");
 		setImageDescriptor(Activator.POWERUNIT_ICON);
 	}
 
@@ -57,6 +64,8 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 	private Button fCreateAfter;
 
 	private Button fParameterized;
+
+	private Button fMockito;
 
 	private IJavaElement jelem;
 
@@ -74,7 +83,6 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		jelem = getInitialJavaElement(selection);
 		initContainerPage(jelem);
 		initTypePage(jelem);
-		setAddComments(true, true);
 		if (jelem instanceof ICompilationUnit) {
 			ICompilationUnit unit = (ICompilationUnit) jelem;
 			try {
@@ -103,6 +111,8 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		doStatusUpdate();
 		setSuperInterfaces(Collections.singletonList("ch.powerunit.TestSuite"),
 				false);
+		doStatusUpdate();
+
 	}
 
 	private void doStatusUpdate() {
@@ -131,31 +141,77 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		// Create the standard input fields
 		createContainerControls(composite, nColumns);
 		createPackageControls(composite, nColumns);
+		createEnclosingTypeControls(composite, nColumns);
 		createSeparator(composite, nColumns);
 		createTypeNameControls(composite, nColumns);
+		createModifierControls(composite, nColumns);
 		createSuperClassControls(composite, nColumns);
+		createSuperInterfacesControls(composite, nColumns);
 
-		// Create the checkbox controlling whether we want stubs
-		fCreateBefore = new Button(composite, SWT.CHECK);
-		fCreateBefore.setText("Add a before method to new class");
+		Label l = new Label(composite, SWT.NO);
+		l.setText("Elements to be created:");
 		GridData gd = new GridData();
 		gd.horizontalSpan = nColumns;
-		fCreateBefore.setLayoutData(gd);
+		l.setLayoutData(gd);
 
+		addGap(composite);
+		fMockito = new Button(composite, SWT.CHECK);
+		fMockito.setText("Add mockito support");
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 1;
+		fMockito.setLayoutData(gd);
+		addGap(composite);
+		addGap(composite);
+
+		addGap(composite);
+		fCreateBefore = new Button(composite, SWT.CHECK);
+		fCreateBefore.setText("Add a before method to new class");
+		gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 1;
+		fCreateBefore.setLayoutData(gd);
+		addGap(composite);
+		addGap(composite);
+
+		addGap(composite);
 		fCreateAfter = new Button(composite, SWT.CHECK);
 		fCreateAfter.setText("Add a after method to new class");
 		gd = new GridData();
-		gd.horizontalSpan = nColumns;
+		gd.horizontalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 1;
 		fCreateBefore.setLayoutData(gd);
+		addGap(composite);
+		addGap(composite);
 
+		addGap(composite);
 		fParameterized = new Button(composite, SWT.CHECK);
 		fParameterized.setText("Create a parameterized test");
 		gd = new GridData();
-		gd.horizontalSpan = nColumns;
+		gd.horizontalAlignment = GridData.FILL;
+		gd.grabExcessHorizontalSpace = true;
+		gd.horizontalSpan = 1;
 		fParameterized.setLayoutData(gd);
+		addGap(composite);
+		addGap(composite);
+
+		createCommentControls(composite, nColumns);
 
 		setControl(composite);
 
+		HelpContextualProvider.setHelpForWizard(getControl());
+	}
+
+	private void addGap(Composite parent) {
+		Label l = new Label(parent, SWT.NO);
+		l.setText("");
+		GridData gd = new GridData();
+		gd.horizontalAlignment = GridData.FILL;
+		gd.horizontalSpan = 1;
+		l.setLayoutData(gd);
 	}
 
 	protected void createTypeMembers(IType newType, ImportsManager imports,
@@ -165,22 +221,27 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 		IJavaElement prev = null;
 
+		String fail = "fail(\"Implement me\");";
+		if (fParameterized.getSelection()) {
+			fail = "fail(\"Implement me \"+param1);";
+		}
+
 		if (underTest == null) {
-
-			if (fParameterized.getSelection()) {
-				prev = newType
-						.createMethod(
-								"@Test public void test() {fail(\"Implement me \"+param1);}",
-								prev, false, monitor);
-			} else {
-				prev = newType.createMethod(
-						"@Test public void test() {fail(\"Implement me\");}",
-						prev, false, monitor);
-			}
-
+			prev = newType.createMethod("@Test public void test() {" + fail
+					+ "}", prev, false, monitor);
 		} else {
+			Set<String> names = new HashSet<>();
 			for (IMethod m : underTest.getMethods()) {
-				// TODO
+				if (!m.isConstructor() && Flags.isPublic(m.getFlags())) {
+					names.add(m.getElementName());
+				}
+			}
+			for (String name : names) {
+				prev = newType.createMethod(
+						"@Test public void test"
+								+ name.substring(0, 1).toUpperCase()
+								+ name.substring(1) + "() {" + fail + "}",
+						prev, false, monitor);
 			}
 		}
 
@@ -208,15 +269,26 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 					+ " underTest;\n", prev, false, monitor);
 		}
 
-		if (fCreateBefore.getSelection() || fCreateAfter.getSelection()) {
+		if (fCreateBefore.getSelection() || fCreateAfter.getSelection()
+				|| fMockito.getSelection()) {
 			imports.addImport("ch.powerunit.TestRule");
 			imports.addImport("ch.powerunit.Rule");
 
 			String field = "";
-			if (fCreateBefore.getSelection() && fCreateAfter.getSelection()) {
+			if (fCreateBefore.getSelection() && fCreateAfter.getSelection()
+					&& fMockito.getSelection()) {
+				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before)).around(after(this::after));\n";
+			} else if (fCreateBefore.getSelection()
+					&& fCreateAfter.getSelection()) {
 				field = "@Rule public final TestRule chain = before(this::before).around(after(this::after));\n";
+			} else if (fCreateBefore.getSelection() && fMockito.getSelection()) {
+				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before));\n";
+			} else if (fCreateAfter.getSelection() && fMockito.getSelection()) {
+				field = "@Rule public final TestRule chain = mockitoRule().around(after(this::after));\n";
 			} else if (fCreateBefore.getSelection()) {
 				field = "@Rule public final TestRule chain = before(this::before);\n";
+			} else if (fMockito.getSelection()) {
+				field = "@Rule public final TestRule chain = mockitoRule();\n";
 			} else {
 				field = "@Rule public final TestRule chain = after(this::after);\n";
 			}
@@ -241,4 +313,5 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		}
 
 	}
+
 }

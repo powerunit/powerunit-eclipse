@@ -303,4 +303,8 @@
   <toc file="maindoc.xml" primary="true"/>
   <index path="maindoc/index"/>
  </extension>
+ 
+ <extension point="org.eclipse.help.contexts">
+  <contexts file="maindoc/context.xml" />
+ </extension>
 </plugin>

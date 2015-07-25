@@ -21,21 +21,20 @@ package ch.powerunit.poweruniteclipse.wizard;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-import ch.powerunit.poweruniteclipse.Activator;
 import ch.powerunit.poweruniteclipse.PowerunitClasspathInitializer;
 import ch.powerunit.poweruniteclipse.PowerunitContainerWizardPage;
+import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
+import ch.powerunit.poweruniteclipse.helper.OpenTypeHelper;
 
 /**
  * @author borettim
@@ -56,14 +55,23 @@ public class NewPowerUnitTestWizard extends Wizard implements INewWizard {
 		this.workbench = workbench;
 		this.selection = selection;
 		setNeedsProgressMonitor(true);
+		setHelpAvailable(true);
 
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see org.eclipse.jface.wizard.Wizard#addPages()
+	 * @see
+	 * org.eclipse.jface.wizard.Wizard#createPageControls(org.eclipse.swt.widgets
+	 * .Composite)
 	 */
+	@Override
+	public void createPageControls(Composite pageContainer) {
+		super.createPageControls(pageContainer);
+		HelpContextualProvider.setHelpForWizard(pageContainer);
+	}
+
 	@Override
 	public void addPages() {
 		page = new NewPowerUnitTestWizardPage();
@@ -71,15 +79,20 @@ public class NewPowerUnitTestWizard extends Wizard implements INewWizard {
 		addPage(page);
 		try {
 			if (page.getJavaProject().findType("ch.powerunit.TestSuite") == null) {
-				container = new PowerunitContainerWizardPage();
-				container.initialize(page.getJavaProject(), null);
-				addPage(container);
+				createContainerWizardPage();
 			}
 		} catch (JavaModelException e) {
-			container = new PowerunitContainerWizardPage();
-			container.initialize(page.getJavaProject(), null);
-			addPage(container);
+			createContainerWizardPage();
 		}
+	}
+
+	/**
+	 * 
+	 */
+	private void createContainerWizardPage() {
+		container = new PowerunitContainerWizardPage();
+		container.initialize(page.getJavaProject(), null);
+		addPage(container);
 	}
 
 	@Override
@@ -101,16 +114,22 @@ public class NewPowerUnitTestWizard extends Wizard implements INewWizard {
 			}
 		}
 		try {
-			getContainer().run(true, true, (m) -> {
-				Display.getDefault().syncExec(() -> {
-					try {
-						page.createType(m);
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				});
-			});
+			getContainer().run(
+					true,
+					true,
+					(m) -> {
+						Display.getDefault().syncExec(
+								() -> {
+									try {
+										page.createType(m);
+										OpenTypeHelper.processSearchResult(
+												page.getCreatedType(), -1);
+									} catch (Exception e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								});
+					});
 		} catch (InvocationTargetException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

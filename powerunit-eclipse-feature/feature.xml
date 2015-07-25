@@ -1378,6 +1378,7 @@ Public License instead of this License.  But first, please read
       <import plugin="org.eclipse.jface.text" version="3.9.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ltk.ui.refactoring" version="3.7.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.editors" version="3.8.200" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.help" version="3.6.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin

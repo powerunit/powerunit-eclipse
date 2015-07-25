@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<contexts>
+   <context id="PowerUnitWizardContextualHelp">
+      <description>This is a wizard to create a PowerUnit class.</description>
+      <topic href="maindoc/create.html" label="Create the Powerunit class"/>
+   </context>
+   <context id="PowerUnitResultContextualHelp">
+      <description>This is the view with the result of the execution of Powerunit</description>
+      <topic href="maindoc/result.html" label="The Powerunit result view"/>
+   </context>
+</contexts>
