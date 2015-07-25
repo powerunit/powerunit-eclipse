@@ -21,28 +21,21 @@ package ch.powerunit.poweruniteclipse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.debug.ui.IDebugModelPresentation;
 import org.eclipse.help.IContextProvider;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.internal.debug.ui.JDIDebugUIPlugin;
 import org.eclipse.jdt.internal.debug.ui.actions.OpenTypeAction;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.source.SourceViewer;
-import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -57,8 +50,6 @@ import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -71,15 +62,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tracker;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.texteditor.IDocumentProvider;
-import org.eclipse.ui.texteditor.ITextEditor;
+import org.eclipse.ui.texteditor.StatusLineContributionItem;
 
 import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
 import ch.powerunit.poweruniteclipse.helper.OpenTypeHelper;
@@ -100,6 +86,8 @@ public class PowerUnitResultView extends ViewPart {
 	private StyledText stackTrace;
 
 	private StyleRange ranges[];
+
+	private StatusLineContributionItem status;
 
 	/*
 	 * (non-Javadoc)
@@ -329,6 +317,9 @@ public class PowerUnitResultView extends ViewPart {
 
 	private void createToolbar() {
 		IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+		status = new StatusLineContributionItem("result");
+		status.setText("");
+		getViewSite().getActionBars().getStatusLineManager().add(status);
 		Action choose = new Action(Messages.PowerUnitResultActionChooseResult_0) {
 		};
 		choose.setImageDescriptor(Activator.POWERUNIT_ICON);
@@ -346,28 +337,29 @@ public class PowerUnitResultView extends ViewPart {
 
 			private void fillManager(MenuManager mn) {
 				menu = mn;
-				results.stream().forEachOrdered(
-						r -> mn.add(new Action(r.getName()) {
-
-							{
-								if (r.getFailures() > 0 || r.getErrors() > 0) {
-									setImageDescriptor(Activator.POWERUNIT_ICON_KO);
-								} else {
-									setImageDescriptor(Activator.POWERUNIT_ICON_OK);
-								}
-
+				results.stream().forEachOrdered(r -> {
+					Testsuites s = r.values().iterator().next();
+					mn.add(new Action(s.getName()) {
+						{
+							if (s.getFailures() > 0 || s.getErrors() > 0) {
+								setImageDescriptor(Activator.POWERUNIT_ICON_KO);
+							} else {
+								setImageDescriptor(Activator.POWERUNIT_ICON_OK);
 							}
 
-							/*
-							 * (non-Javadoc)
-							 * 
-							 * @see org.eclipse.jface.action.Action#run()
-							 */
-							@Override
-							public void run() {
-								setCurrent(r);
-							}
-						}));
+						}
+
+						/*
+						 * (non-Javadoc)
+						 * 
+						 * @see org.eclipse.jface.action.Action#run()
+						 */
+						@Override
+						public void run() {
+							setCurrent(s, true);
+						}
+					});
+				});
 			}
 
 			@Override
@@ -391,20 +383,37 @@ public class PowerUnitResultView extends ViewPart {
 		mgr.add(choose);
 	}
 
-	private List<Testsuites> results = new ArrayList<>();
+	private List<Map<Long, Testsuites>> results = new ArrayList<>();
+
+	private Map<Long, Testsuites> resultSearch = new HashMap<>();
 
 	private int maxResults = 10;
 
-	public void addResult(Testsuites suites) {
-		results.add(suites);
-		while (results.size() > maxResults) {
-			results.remove(0);
+	public void addResult(long id, Testsuites suites, boolean display) {
+		if (resultSearch.containsKey(id)) {
+			for (Map<Long, Testsuites> s : results) {
+				if (s.keySet().iterator().next() == id) {
+					s.put(id, suites);
+					break;
+				}
+			}
+			resultSearch.put(id, suites);
+		} else {
+			Map<Long, Testsuites> tmp = new HashMap<>();
+			tmp.put(id, suites);
+			results.add(tmp);
+			resultSearch.put(id, suites);
+			while (results.size() > maxResults) {
+				resultSearch.remove(results.remove(0).keySet().iterator()
+						.next());
+			}
 		}
-		setCurrent(suites);
+		setCurrent(suites, display);
 	}
 
-	private void setCurrent(Testsuites suites) {
+	private void setCurrent(Testsuites suites, boolean display) {
 		resultViewer.setInput(suites);
+		status.setText(suites.getName());
 		resultViewer.refresh();
 	}
 
@@ -528,7 +537,9 @@ public class PowerUnitResultView extends ViewPart {
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.eclipse.ui.part.WorkbenchPart#getAdapter(java.lang.Class)
 	 */
 	@Override

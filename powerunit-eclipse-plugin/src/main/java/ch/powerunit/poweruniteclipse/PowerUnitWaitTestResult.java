@@ -21,88 +21,111 @@ import ch.powerunit.report.Testsuite;
 import ch.powerunit.report.Testsuites;
 
 final class PowerUnitWaitTestResult extends Job {
-    private final ILaunch launch;
 
-    private final Path temporaryPath;
+	private static long id = 0;
 
-    private final ILaunchConfiguration configuration;
+	private final long currentId;
 
-    private static final JAXBContext JAXB_CONTEXT;
+	private final ILaunch launch;
 
-    static {
-        try {
-            JAXB_CONTEXT = JAXBContext.newInstance(Testsuites.class);
-        } catch (JAXBException e) {
-            throw new IllegalArgumentException("Unable to setup jaxb "
-                    + e.getMessage(), e);
-        }
-    }
+	private final Path temporaryPath;
 
-    PowerUnitWaitTestResult(ILaunchConfiguration configuration, ILaunch launch,
-            Path temporaryPath) {
-        super("Waiting test result");
-        this.launch = launch;
-        this.temporaryPath = temporaryPath;
-        this.configuration = configuration;
-    }
+	private final ILaunchConfiguration configuration;
 
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-        while (!launch.isTerminated()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+	private static final JAXBContext JAXB_CONTEXT;
 
-            }
-        }
+	static {
+		try {
+			JAXB_CONTEXT = JAXBContext.newInstance(Testsuites.class);
+		} catch (JAXBException e) {
+			throw new IllegalArgumentException("Unable to setup jaxb "
+					+ e.getMessage(), e);
+		}
+	}
 
-        Testsuites suites = new Testsuites();
-        suites.setName(configuration.getName() + " ended at " + new Date());
-        suites.setErrors(0);
-        suites.setFailures(0);
+	PowerUnitWaitTestResult(ILaunchConfiguration configuration, ILaunch launch,
+			Path temporaryPath) {
+		super("Waiting test result");
+		currentId = id++;
+		this.launch = launch;
+		this.temporaryPath = temporaryPath;
+		this.configuration = configuration;
+	}
 
-        Arrays.stream(
-                temporaryPath.toFile().listFiles(
-                        f -> f.getName().endsWith(".xml")))
-                .forEach(
-                        f -> {
-                            try {
-                                Object o = JAXB_CONTEXT.createUnmarshaller()
-                                        .unmarshal(f);
-                                if (o instanceof Testsuite) {
-                                    suites.getTestsuite().add((Testsuite) o);
-                                    suites.setFailures(suites.getFailures()
-                                            + ((Testsuite) o).getFailures());
-                                    suites.setErrors(suites.getErrors()
-                                            + ((Testsuite) o).getErrors());
-                                } else if (o instanceof Testsuites) {
-                                    for (Testsuite s : ((Testsuites) o)
-                                            .getTestsuite()) {
-                                        suites.getTestsuite().add(s);
-                                        suites.setFailures(suites.getFailures()
-                                                + s.getFailures());
-                                        suites.setErrors(suites.getErrors()
-                                                + s.getErrors());
-                                    }
-                                }
-                            } catch (JAXBException e) {
-                                // TODO
-                            }
-                            f.delete();
-                        });
-        temporaryPath.toFile().delete();
+	@Override
+	protected IStatus run(IProgressMonitor monitor) {
+		long pool = 0;
+		while (!launch.isTerminated()) {
+			try {
+				Thread.sleep(100);
+				pool++;
+			} catch (InterruptedException e) {
 
-        Display.getDefault().asyncExec(
-                () -> {
-                    try {
-                        IViewPart view = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(PowerUnitResultView.ID);
-                        ((PowerUnitResultView) view).addResult(suites);
-                    } catch (Exception e) {
+			}
+			if (pool % 100 == 1) {
+				getResultFromFile(configuration.getName() + " - in process",
+						false, false);
+			}
+		}
 
-                    }
-                });
-        return Status.OK_STATUS;
-    }
+		getResultFromFile(configuration.getName() + " ended at " + new Date(),
+				true, true);
+		temporaryPath.toFile().delete();
+		return Status.OK_STATUS;
+	}
+
+	/**
+	 * 
+	 */
+	private void getResultFromFile(String name, boolean delete, boolean display) {
+		Testsuites suites = new Testsuites();
+		suites.setName(name);
+		suites.setErrors(0);
+		suites.setFailures(0);
+
+		Arrays.stream(
+				temporaryPath.toFile().listFiles(
+						f -> f.getName().endsWith(".xml")))
+				.forEach(
+						f -> {
+							try {
+								Object o = JAXB_CONTEXT.createUnmarshaller()
+										.unmarshal(f);
+								if (o instanceof Testsuite) {
+									suites.getTestsuite().add((Testsuite) o);
+									suites.setFailures(suites.getFailures()
+											+ ((Testsuite) o).getFailures());
+									suites.setErrors(suites.getErrors()
+											+ ((Testsuite) o).getErrors());
+								} else if (o instanceof Testsuites) {
+									for (Testsuite s : ((Testsuites) o)
+											.getTestsuite()) {
+										suites.getTestsuite().add(s);
+										suites.setFailures(suites.getFailures()
+												+ s.getFailures());
+										suites.setErrors(suites.getErrors()
+												+ s.getErrors());
+									}
+								}
+							} catch (JAXBException e) {
+								// TODO
+							}
+							if (delete) {
+								f.delete();
+							}
+						});
+
+		Display.getDefault().asyncExec(
+				() -> {
+					try {
+						IViewPart view = PlatformUI.getWorkbench()
+								.getActiveWorkbenchWindow().getActivePage()
+								.showView(PowerUnitResultView.ID);
+						((PowerUnitResultView) view).addResult(currentId,
+								suites, display);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
+	}
 }
