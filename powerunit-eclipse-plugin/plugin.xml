@@ -307,4 +307,18 @@
  <extension point="org.eclipse.help.contexts">
   <contexts file="maindoc/context.xml" />
  </extension>
+ 
+ <extension point="org.eclipse.ui.cheatsheets.cheatSheetContent">
+    <category
+       id="ch.powerunit.PowerUnitCategory" 
+       name="%resultView.category">
+	</category>
+	<cheatsheet
+		name="%cheatsheet.testdelegator.name"
+		contentFile="maindoc/delegator/delegator.xml"
+		id="org.powerunit.cheatsheet.delegator"
+		category="ch.powerunit.PowerUnitCategory">
+		<description>%cheatsheet.testdelegator.description</description>
+	</cheatsheet>
+  </extension>
 </plugin>

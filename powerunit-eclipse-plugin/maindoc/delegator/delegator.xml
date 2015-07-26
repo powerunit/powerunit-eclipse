@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<cheatsheet title="Create Test framework with Powerunit">
+	<intro>
+		<description>
+			Welcome to the Test Framework Powerunit tutorial.
+			It will help you build a test framework based on Powerunit.
+			Let&apos;s get started!
+		</description>
+	</intro>
+	<item
+		title="Open the Java Perspective">
+		<action pluginId="org.eclipse.ui.cheatsheets"
+			class="org.eclipse.ui.internal.cheatsheets.actions.OpenPerspective"
+			param1="org.eclipse.jdt.ui.JavaPerspective" />
+		<description>
+			Select Window->Open Perspective->Java in the menu bar at the top of the
+			workbench.
+			This step changes the perspective to set up the Eclipse workbench for
+			Java development.
+			You can click the "Click to Perform" button to have the "Java"
+			perspective opened automatically.
+		</description>
+	</item>
+ 	<item
+       title="Create the test supporting class">
+    	<action pluginId="ch.powerunit.eclipse.plugin"
+			class="ch.powerunit.poweruniteclipse.help.OpenNewTestWizardAction" />
+    	<description>
+       		In this step, we will create a test class, which will be the testframework itself. 
+       		To do so, open the wizard Create a Powerunit test case and create a new powerunit test class. 
+       		Specify that the test is Parameterized.
+    	</description>
+ 	</item>
+ 	<item 
+ 		title="Create the test interface">
+ 		<action pluginId="org.eclipse.jdt.ui"
+			class="org.eclipse.jdt.ui.actions.OpenNewClassWizardAction" />
+ 		<description>
+ 			In this step, we will create the test interface. This interface exposes the configuration for the test framework.
+ 			To do so, open the wizard to create a new test class.
+ 		</description>
+ 	</item>
+ 	<item
+ 		title="Transform the new class into test interface">
+ 		<description>
+ 			Add the annotation @TestInterface(...) to the new created class. The attribute of this
+ 			annotation will be the class created in the step "Create the test supporting class".
+ 		</description>
+ 	</item>
+ 	<item
+ 		title="Transform the test supporting class into a test framework">
+ 		<description>
+ 			Add the annotation @TestDelegator to the class create in the step "Create the test supporting class".
+ 			Then modify the method "getDatas" to have one parameter, which is of type of the class
+ 			created in the step "create the test interface". 
+ 		</description>
+ 	</item>
+</cheatsheet>

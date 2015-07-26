@@ -78,7 +78,8 @@ public class NewPowerUnitTestWizard extends Wizard implements INewWizard {
 		page.init(selection);
 		addPage(page);
 		try {
-			if (page.getJavaProject().findType("ch.powerunit.TestSuite") == null) {
+			if (page.getJavaProject() == null
+					|| page.getJavaProject().findType("ch.powerunit.TestSuite") == null) {
 				createContainerWizardPage();
 			}
 		} catch (JavaModelException e) {
@@ -99,15 +100,17 @@ public class NewPowerUnitTestWizard extends Wizard implements INewWizard {
 	public boolean performFinish() {
 		if (container != null) {
 			try {
-				IClasspathEntry[] entries = page.getJavaProject()
-						.getRawClasspath();
-				IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
+				if (page.getJavaProject().findType("ch.powerunit.TestSuite") == null) {
+					IClasspathEntry[] entries = page.getJavaProject()
+							.getRawClasspath();
+					IClasspathEntry[] newEntries = new IClasspathEntry[entries.length + 1];
 
-				System.arraycopy(entries, 0, newEntries, 0, entries.length);
+					System.arraycopy(entries, 0, newEntries, 0, entries.length);
 
-				newEntries[entries.length] = JavaCore
-						.newContainerEntry(PowerunitClasspathInitializer.POWERUNIT_PATH);
-				page.getJavaProject().setRawClasspath(newEntries, null);
+					newEntries[entries.length] = JavaCore
+							.newContainerEntry(PowerunitClasspathInitializer.POWERUNIT_PATH);
+					page.getJavaProject().setRawClasspath(newEntries, null);
+				}
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 				return false;
