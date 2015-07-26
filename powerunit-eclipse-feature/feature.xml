@@ -2,7 +2,7 @@
 <feature
       id="ch.powerunit.eclipse.feature"
       label="PowerUnit support"
-      version="0.0.2.qualifier"
+      version="0.0.3.qualifier"
       provider-name="PowerUnit"
       plugin="ch.powerunit.eclipse.plugin">
 
@@ -1385,21 +1385,21 @@ Public License instead of this License.  But first, please read
          id="ch.powerunit.eclipse.plugin"
          download-size="0"
          install-size="0"
-         version="0.0.2.qualifier"
+         version="0.0.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="ch.powerunit.powerunit"
          download-size="0"
          install-size="0"
-         version="0.0.2.qualifier"
+         version="0.0.3.qualifier"
          unpack="false"/>
 
    <plugin
          id="ch.powerunit.powerunit-extensions"
          download-size="0"
          install-size="0"
-         version="0.0.2.qualifier"
+         version="0.0.3.qualifier"
          unpack="false"/>
 
 </feature>

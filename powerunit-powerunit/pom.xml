@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>ch.powerunit</groupId>
 		<artifactId>powerunit-eclipse</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.3-SNAPSHOT</version>
 		<relativePath>../powerunit-eclipse/pom.xml</relativePath>
 	</parent>
 	<name>Powerunit - Java Testing framework for JDK 1.8 - Eclipse integration - PowerUnit exposition</name>
