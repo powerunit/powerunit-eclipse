@@ -287,7 +287,7 @@
        class="ch.powerunit.poweruniteclipse.wizard.NewPowerUnitTestWizard"
        icon="./icons/logo.gif"
        category="ch.powerunit.PowerUnitCategory">
-     <description>Create a Powerunit test case</description>
+     <description>%wizard.name</description>
      <selection class="org.eclipse.core.resources.IResource" /> 
    </wizard>
  </extension>
