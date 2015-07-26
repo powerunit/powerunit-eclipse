@@ -15,6 +15,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 
 import ch.powerunit.report.Testsuite;
@@ -62,7 +63,7 @@ final class PowerUnitWaitTestResult extends Job {
 			} catch (InterruptedException e) {
 
 			}
-			if (pool % 100 == 1) {
+			if (pool % 10 == 1) {
 				getResultFromFile(configuration.getName() + " - in process",
 						false, false);
 			}
@@ -118,11 +119,18 @@ final class PowerUnitWaitTestResult extends Job {
 		Display.getDefault().asyncExec(
 				() -> {
 					try {
-						IViewPart view = PlatformUI.getWorkbench()
-								.getActiveWorkbenchWindow().getActivePage()
-								.showView(PowerUnitResultView.ID);
+
+						IWorkbenchPage page = PlatformUI.getWorkbench()
+								.getActiveWorkbenchWindow().getActivePage();
+						IViewPart view = page.findView(PowerUnitResultView.ID);
 						((PowerUnitResultView) view).addResult(currentId,
 								suites, display);
+						if (display) {
+							PlatformUI.getWorkbench()
+									.getActiveWorkbenchWindow().getActivePage()
+									.showView(PowerUnitResultView.ID);
+						}
+
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

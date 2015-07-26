@@ -391,6 +391,11 @@ public class PowerUnitResultView extends ViewPart {
 
 	public void addResult(long id, Testsuites suites, boolean display) {
 		if (resultSearch.containsKey(id)) {
+			if (suites.getTestsuite().size() == resultSearch.get(id)
+					.getTestsuite().size()
+					&& !display) {
+				return;
+			}
 			for (Map<Long, Testsuites> s : results) {
 				if (s.keySet().iterator().next() == id) {
 					s.put(id, suites);
