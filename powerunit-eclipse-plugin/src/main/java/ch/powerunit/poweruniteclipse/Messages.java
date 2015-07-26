@@ -28,6 +28,14 @@ public class Messages extends NLS {
 	public static String PowerUnitLaunchTabFragment_1;
 	public static String PowerUnitLaunchTabFragment_2;
 	public static String JavaMainTab_Choose_a_main__type_to_launch__12;
+	public static String NewPowerUnitTestWizardPage_0;
+	public static String NewPowerUnitTestWizardPage_1;
+	public static String NewPowerUnitTestWizardPage_10;
+	public static String NewPowerUnitTestWizardPage_2;
+	public static String NewPowerUnitTestWizardPage_6;
+	public static String NewPowerUnitTestWizardPage_7;
+	public static String NewPowerUnitTestWizardPage_8;
+	public static String NewPowerUnitTestWizardPage_9;
 	public static String PowerUnitResultActionChooseResult_0;
     static {
         // initialize resource bundle

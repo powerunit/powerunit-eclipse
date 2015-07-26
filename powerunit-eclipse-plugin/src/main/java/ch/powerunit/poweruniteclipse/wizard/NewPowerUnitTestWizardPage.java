@@ -41,9 +41,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.PlatformUI;
 
 import ch.powerunit.poweruniteclipse.Activator;
+import ch.powerunit.poweruniteclipse.Messages;
 import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
 
 /**
@@ -53,9 +53,10 @@ import ch.powerunit.poweruniteclipse.help.HelpContextualProvider;
 public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 	public NewPowerUnitTestWizardPage() {
-		super(NewTypeWizardPage.CLASS_TYPE, "Powerunit test case");
-		setTitle("Create the Powerunit class");
-		setDescription("Specify the required information for the new Powerunit test class");
+		super(NewTypeWizardPage.CLASS_TYPE,
+				Messages.NewPowerUnitTestWizardPage_0);
+		setTitle(Messages.NewPowerUnitTestWizardPage_1);
+		setDescription(Messages.NewPowerUnitTestWizardPage_2);
 		setImageDescriptor(Activator.POWERUNIT_ICON);
 	}
 
@@ -88,7 +89,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 			try {
 				if (unit.getAllTypes().length > 0) {
 					IType t = unit.getAllTypes()[0];
-					setTypeName(t.getElementName() + "Test", true);
+					setTypeName(t.getElementName() + "Test", true); //$NON-NLS-1$
 					for (IPackageFragmentRoot r : jelem.getJavaProject()
 							.getPackageFragmentRoots()) {
 						if (r.getKind() == IPackageFragmentRoot.K_SOURCE
@@ -97,7 +98,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 												jelem.getJavaProject()
 														.getPath())
 										.toPortableString()
-										.startsWith("src/test/java")) {
+										.startsWith("src/test/java")) { //$NON-NLS-1$
 							setPackageFragmentRoot(r, true);
 							break;
 						}
@@ -109,7 +110,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 			}
 		}
 		doStatusUpdate();
-		setSuperInterfaces(Collections.singletonList("ch.powerunit.TestSuite"),
+		setSuperInterfaces(Collections.singletonList("ch.powerunit.TestSuite"), //$NON-NLS-1$
 				false);
 		doStatusUpdate();
 
@@ -149,14 +150,14 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 		createSuperInterfacesControls(composite, nColumns);
 
 		Label l = new Label(composite, SWT.NO);
-		l.setText("Elements to be created:");
+		l.setText(Messages.NewPowerUnitTestWizardPage_6);
 		GridData gd = new GridData();
 		gd.horizontalSpan = nColumns;
 		l.setLayoutData(gd);
 
 		addGap(composite);
 		fMockito = new Button(composite, SWT.CHECK);
-		fMockito.setText("Add mockito support");
+		fMockito.setText(Messages.NewPowerUnitTestWizardPage_7);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
@@ -167,7 +168,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 		addGap(composite);
 		fCreateBefore = new Button(composite, SWT.CHECK);
-		fCreateBefore.setText("Add a before method to new class");
+		fCreateBefore.setText(Messages.NewPowerUnitTestWizardPage_8);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
@@ -178,7 +179,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 		addGap(composite);
 		fCreateAfter = new Button(composite, SWT.CHECK);
-		fCreateAfter.setText("Add a after method to new class");
+		fCreateAfter.setText(Messages.NewPowerUnitTestWizardPage_9);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
@@ -189,7 +190,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 		addGap(composite);
 		fParameterized = new Button(composite, SWT.CHECK);
-		fParameterized.setText("Create a parameterized test");
+		fParameterized.setText(Messages.NewPowerUnitTestWizardPage_10);
 		gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.grabExcessHorizontalSpace = true;
@@ -207,7 +208,7 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 
 	private void addGap(Composite parent) {
 		Label l = new Label(parent, SWT.NO);
-		l.setText("");
+		l.setText(""); //$NON-NLS-1$
 		GridData gd = new GridData();
 		gd.horizontalAlignment = GridData.FILL;
 		gd.horizontalSpan = 1;
@@ -217,18 +218,18 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 	protected void createTypeMembers(IType newType, ImportsManager imports,
 			IProgressMonitor monitor) throws CoreException {
 
-		imports.addImport("ch.powerunit.Test");
+		imports.addImport("ch.powerunit.Test"); //$NON-NLS-1$
 
 		IJavaElement prev = null;
 
-		String fail = "fail(\"Implement me\");";
+		String fail = "fail(\"Implement me\");"; //$NON-NLS-1$
 		if (fParameterized.getSelection()) {
-			fail = "fail(\"Implement me \"+param1);";
+			fail = "fail(\"Implement me \"+param1);"; //$NON-NLS-1$
 		}
 
 		if (underTest == null) {
-			prev = newType.createMethod("@Test public void test() {" + fail
-					+ "}", prev, false, monitor);
+			prev = newType.createMethod("@Test public void test() {" + fail //$NON-NLS-1$
+					+ "}", prev, false, monitor); //$NON-NLS-1$
 		} else {
 			Set<String> names = new HashSet<>();
 			for (IMethod m : underTest.getMethods()) {
@@ -238,76 +239,76 @@ public final class NewPowerUnitTestWizardPage extends NewTypeWizardPage {
 			}
 			for (String name : names) {
 				prev = newType.createMethod(
-						"@Test public void test"
+						"@Test public void test" //$NON-NLS-1$
 								+ name.substring(0, 1).toUpperCase()
-								+ name.substring(1) + "() {" + fail + "}",
+								+ name.substring(1) + "() {" + fail + "}", //$NON-NLS-1$ //$NON-NLS-2$
 						prev, false, monitor);
 			}
 		}
 
 		if (fCreateAfter.getSelection()) {
-			prev = newType.createMethod("public void after() {}", prev, false,
+			prev = newType.createMethod("public void after() {}", prev, false, //$NON-NLS-1$
 					monitor);
 		}
 
 		if (fCreateBefore.getSelection()) {
 			if (underTest != null
-					&& underTest.getMethod("<init>", new String[] {}) != null) {
+					&& underTest.getMethod("<init>", new String[] {}) != null) { //$NON-NLS-1$
 				prev = newType.createMethod(
-						"public void before() {underTest = new "
-								+ underTest.getElementName() + "();}", prev,
+						"public void before() {underTest = new " //$NON-NLS-1$
+								+ underTest.getElementName() + "();}", prev, //$NON-NLS-1$
 						false, monitor);
 			} else {
-				prev = newType.createMethod("public void before() {}", prev,
+				prev = newType.createMethod("public void before() {}", prev, //$NON-NLS-1$
 						false, monitor);
 			}
 		}
 
 		if (underTest != null) {
 			imports.addImport(underTest.getFullyQualifiedName());
-			prev = newType.createField("private " + underTest.getElementName()
-					+ " underTest;\n", prev, false, monitor);
+			prev = newType.createField("private " + underTest.getElementName() //$NON-NLS-1$
+					+ " underTest;\n", prev, false, monitor); //$NON-NLS-1$
 		}
 
 		if (fCreateBefore.getSelection() || fCreateAfter.getSelection()
 				|| fMockito.getSelection()) {
-			imports.addImport("ch.powerunit.TestRule");
-			imports.addImport("ch.powerunit.Rule");
+			imports.addImport("ch.powerunit.TestRule"); //$NON-NLS-1$
+			imports.addImport("ch.powerunit.Rule"); //$NON-NLS-1$
 
-			String field = "";
+			String field = ""; //$NON-NLS-1$
 			if (fCreateBefore.getSelection() && fCreateAfter.getSelection()
 					&& fMockito.getSelection()) {
-				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before)).around(after(this::after));\n";
+				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before)).around(after(this::after));\n"; //$NON-NLS-1$
 			} else if (fCreateBefore.getSelection()
 					&& fCreateAfter.getSelection()) {
-				field = "@Rule public final TestRule chain = before(this::before).around(after(this::after));\n";
+				field = "@Rule public final TestRule chain = before(this::before).around(after(this::after));\n"; //$NON-NLS-1$
 			} else if (fCreateBefore.getSelection() && fMockito.getSelection()) {
-				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before));\n";
+				field = "@Rule public final TestRule chain = mockitoRule().around(before(this::before));\n"; //$NON-NLS-1$
 			} else if (fCreateAfter.getSelection() && fMockito.getSelection()) {
-				field = "@Rule public final TestRule chain = mockitoRule().around(after(this::after));\n";
+				field = "@Rule public final TestRule chain = mockitoRule().around(after(this::after));\n"; //$NON-NLS-1$
 			} else if (fCreateBefore.getSelection()) {
-				field = "@Rule public final TestRule chain = before(this::before);\n";
+				field = "@Rule public final TestRule chain = before(this::before);\n"; //$NON-NLS-1$
 			} else if (fMockito.getSelection()) {
-				field = "@Rule public final TestRule chain = mockitoRule();\n";
+				field = "@Rule public final TestRule chain = mockitoRule();\n"; //$NON-NLS-1$
 			} else {
-				field = "@Rule public final TestRule chain = after(this::after);\n";
+				field = "@Rule public final TestRule chain = after(this::after);\n"; //$NON-NLS-1$
 			}
 			prev = newType.createField(field, prev, false, monitor);
 		}
 
 		if (fParameterized.getSelection()) {
-			imports.addImport("java.util.Arrays");
-			imports.addImport("java.util.stream.Stream");
+			imports.addImport("java.util.Arrays"); //$NON-NLS-1$
+			imports.addImport("java.util.stream.Stream"); //$NON-NLS-1$
 
-			imports.addImport("ch.powerunit.Parameters");
-			imports.addImport("ch.powerunit.Parameter");
+			imports.addImport("ch.powerunit.Parameters"); //$NON-NLS-1$
+			imports.addImport("ch.powerunit.Parameter"); //$NON-NLS-1$
 
-			prev = newType.createField("@Parameter(0) public String param1;\n",
+			prev = newType.createField("@Parameter(0) public String param1;\n", //$NON-NLS-1$
 					prev, false, monitor);
 
 			prev = newType
 					.createMethod(
-							"@Parameters public static Stream<Object[]> getDatas() {return Arrays.stream(new Object[][] { { \"x\"} });}",
+							"@Parameters public static Stream<Object[]> getDatas() {return Arrays.stream(new Object[][] { { \"x\"} });}", //$NON-NLS-1$
 							prev, false, monitor);
 
 		}
