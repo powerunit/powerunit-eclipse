@@ -12,8 +12,8 @@
     	<action pluginId="ch.powerunit.eclipse.plugin"
 			class="ch.powerunit.poweruniteclipse.help.OpenNewTestWizardAction" />
     	<description>
-       		In this step, we will create a test class, which will be the testframework itself. 
-       		To do so, open the wizard Create a Powerunit test case and create a new powerunit test class. 
+       		In this step, we will create a test class, which will be the test framework itself. 
+       		To do so, open the wizard "Powerunit test" (Menu File -> New -> Other ...) and create a new powerunit test class. 
        		Specify that the test is Parameterized.
     	</description>
  	</item>
@@ -23,7 +23,7 @@
 			class="org.eclipse.jdt.ui.actions.OpenNewClassWizardAction" />
  		<description>
  			In this step, we will create the test interface. This interface exposes the configuration for the test framework.
- 			To do so, open the wizard to create a new test class.
+ 			To do so, open the wizard to create a new test class (Menu File -> New -> Class).
  		</description>
  	</item>
  	<item
